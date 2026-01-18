@@ -1,9 +1,142 @@
 import React from 'react'
+import {
+    FileText,
+    Image as ImageIcon,
+    Video,
+    Music,
+    FileJson,
+    FileDiff,
+    Search,
+    Binary,
+    Eye,
+    Type,
+    AlignLeft,
+    Key,
+    Fingerprint,
+    Calendar,
+    Clock,
+    Code2,
+    Globe,
+    FileCode,
+    ScrollText,
+    BookOpen,
+    PenTool,
+    Hash,
+    ShieldCheck,
+    Scissors
+} from 'lucide-react'
 
-const page = () => {
+const ToolGroup = ({ title, tools }: { title: string; tools: { name: string; icon: React.ReactNode }[] }) => (
+    <div className="mb-12">
+        <h2 className="text-xl font-medium text-neutral-900 dark:text-neutral-200 mb-4">{title}</h2>
+        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {tools.map((tool) => (
+                <li
+                    key={tool.name}
+                    className="p-4 border border-neutral-200 dark:border-neutral-800 rounded-lg bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 text-sm hover:border-neutral-300 dark:hover:border-neutral-700 transition-colors cursor-default flex items-center gap-3"
+                >
+                    <span className="text-neutral-400 dark:text-neutral-500">{tool.icon}</span>
+                    {tool.name}
+                </li>
+            ))}
+        </ul>
+    </div>
+)
+
+const ToolsPage = () => {
+    const iconProps = { className: "w-4 h-4" };
+
+    const toolCategories = [
+        {
+            title: "PDF Tools",
+            tools: [
+                { name: "PDF Merge", icon: <FileText {...iconProps} /> },
+                { name: "PDF Compress", icon: <FileText {...iconProps} /> },
+                { name: "PDF Split", icon: <Scissors {...iconProps} /> },
+                { name: "Images → PDF", icon: <ImageIcon {...iconProps} /> },
+                { name: "PDF → Images", icon: <FileText {...iconProps} /> },
+                { name: "PDF Page Reorder", icon: <FileText {...iconProps} /> }
+            ]
+        },
+        {
+            title: "File & Media Utilities",
+            tools: [
+                { name: "Image Compress", icon: <ImageIcon {...iconProps} /> },
+                { name: "Image Resize", icon: <ImageIcon {...iconProps} /> },
+                { name: "Image Format Converter", icon: <ImageIcon {...iconProps} /> },
+                { name: "Video Downloader", icon: <Video {...iconProps} /> },
+                { name: "Audio Extract from Video", icon: <Music {...iconProps} /> }
+            ]
+        },
+        {
+            title: "Text & Data",
+            tools: [
+                { name: "JSON Formatter / Validator", icon: <FileJson {...iconProps} /> },
+                { name: "JSON ↔ CSV", icon: <FileJson {...iconProps} /> },
+                { name: "Diff Checker", icon: <FileDiff {...iconProps} /> },
+                { name: "Regex Tester", icon: <Search {...iconProps} /> },
+                { name: "Base64 Encode / Decode", icon: <Binary {...iconProps} /> }
+            ]
+        },
+        {
+            title: "General Utilities",
+            tools: [
+                { name: "Markdown Preview", icon: <Eye {...iconProps} /> },
+                { name: "Case Converter", icon: <Type {...iconProps} /> },
+                { name: "Word / Character Counter", icon: <AlignLeft {...iconProps} /> }
+            ]
+        },
+        {
+            title: "Developer-Specific Tools",
+            tools: [
+                { name: "JWT Decoder", icon: <Key {...iconProps} /> },
+                { name: "UUID Generator", icon: <Fingerprint {...iconProps} /> },
+                { name: "Timestamp ↔ Date Converter", icon: <Calendar {...iconProps} /> },
+                { name: "Cron Expression Explainer", icon: <Clock {...iconProps} /> },
+                { name: "Headers Formatter", icon: <Code2 {...iconProps} /> },
+                { name: "User-Agent Parser", icon: <Globe {...iconProps} /> }
+            ]
+        },
+        {
+            title: "Nice-to-Have & Productivity",
+            tools: [
+                { name: "Gitignore Generator", icon: <FileCode {...iconProps} /> },
+                { name: "License Generator", icon: <ScrollText {...iconProps} /> },
+                { name: "README Generator", icon: <BookOpen {...iconProps} /> },
+                { name: "Lorem Ipsum Generator", icon: <Type {...iconProps} /> },
+                { name: "Commit Message Helper", icon: <PenTool {...iconProps} /> }
+            ]
+        },
+        {
+            title: "Advanced / Niche",
+            tools: [
+                { name: "Hash Tools (SHA256, Keccak)", icon: <Hash {...iconProps} /> },
+                { name: "Address Checksum Validator", icon: <ShieldCheck {...iconProps} /> },
+                { name: "Base58 Encode / Decode", icon: <Binary {...iconProps} /> },
+                { name: "ABI Formatter", icon: <Code2 {...iconProps} /> },
+                { name: "Video Trimmer", icon: <Video {...iconProps} /> },
+                { name: "Audio Converter", icon: <Music {...iconProps} /> }
+            ]
+        }
+    ];
+
     return (
-        <div>page</div>
+        <div className="max-w-[1100px] mx-auto py-12 px-6">
+            <div className="mb-16">
+                <h1 className="text-3xl font-medium text-neutral-900 dark:text-white mb-4">Overview</h1>
+                <p className="text-neutral-500 dark:text-neutral-400 text-lg max-w-2xl leading-relaxed">
+                    A clean, client-side toolbox of essential developer utilities. <br />
+                    Fast. Private. Calm.
+                </p>
+            </div>
+
+            <div className="space-y-4">
+                {toolCategories.map((category) => (
+                    <ToolGroup key={category.title} title={category.title} tools={category.tools} />
+                ))}
+            </div>
+        </div>
     )
 }
 
-export default page
+export default ToolsPage
