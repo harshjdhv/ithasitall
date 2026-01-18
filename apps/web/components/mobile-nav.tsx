@@ -6,7 +6,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { Menu, X } from "lucide-react"
-import { docsConfig } from "@/config/docs" // Ensure this matches path
+import { toolsConfig } from "@/config/tools"
 
 export function MobileNav() {
     const [open, setOpen] = React.useState(false)
@@ -86,7 +86,7 @@ export function MobileNav() {
 
                                 <div className="flex-1 overflow-y-auto p-6">
                                     <nav className="space-y-8">
-                                        {docsConfig.nav.map((group) => (
+                                        {toolsConfig.nav.map((group) => (
                                             <div key={group.title} className="space-y-3">
                                                 <p className="text-xs uppercase tracking-widest text-muted-foreground/60">
                                                     {group.title}
@@ -118,7 +118,7 @@ export function MobileNav() {
                                         {/* Mobile only links */}
                                         <div className="pt-4 border-t border-border">
                                             <Link
-                                                href="https://github.com"
+                                                href="https://github.com/harshjdhv/ithasitall"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="flex items-center gap-2 py-2 text-sm text-muted-foreground hover:text-foreground"

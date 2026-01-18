@@ -4,7 +4,7 @@ import type { Viewport } from "next"
 import "@workspace/ui/globals.css"
 import { Providers } from "@/components/providers"
 import { SiteHeader } from "@/components/site-header"
-import { DocsSidebar } from "@/components/docs-sidebar"
+import { ToolsSidebar } from "@/components/tools-sidebar"
 
 const fontSans = Geist({
   subsets: ["latin"],
@@ -42,7 +42,7 @@ export default function RootLayout({
           <div className="min-h-svh flex flex-col">
             <SiteHeader />
             <div className="flex-1 flex">
-              <DocsSidebar />
+              <ToolsSidebar />
               <main className="flex-1 w-full px-6 py-12 md:py-16">
                 <div className="max-w-4xl mx-auto">
                   {children}

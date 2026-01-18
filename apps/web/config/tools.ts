@@ -1,15 +1,15 @@
-export const docsConfig = {
+export const toolsConfig = {
   nav: [
     {
       title: "Getting Started",
       items: [
         {
           title: "Introduction",
-          href: "/docs",
+          href: "/tools",
         },
         {
           title: "Installation",
-          href: "/docs/installation",
+          href: "/tools/installation",
         },
       ],
     },
@@ -18,11 +18,11 @@ export const docsConfig = {
       items: [
         {
           title: "Philosophy",
-          href: "/docs/philosophy",
+          href: "/tools/philosophy",
         },
         {
           title: "Theming",
-          href: "/docs/theming",
+          href: "/tools/theming",
         },
       ],
     },
@@ -31,15 +31,15 @@ export const docsConfig = {
       items: [
         {
           title: "CLI Reference",
-          href: "/docs/cli",
+          href: "/tools/cli",
         },
         {
           title: "Linting Rules",
-          href: "/docs/linting",
+          href: "/tools/linting",
         },
         {
           title: "CI/CD Setup",
-          href: "/docs/cicd",
+          href: "/tools/cicd",
         },
       ],
     },
