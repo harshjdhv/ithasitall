@@ -4,12 +4,8 @@ export const toolsConfig = {
       title: "Getting Started",
       items: [
         {
-          title: "Introduction",
+          title: "Overview",
           href: "/tools",
-        },
-        {
-          title: "Installation",
-          href: "/tools/installation",
         },
       ],
     },

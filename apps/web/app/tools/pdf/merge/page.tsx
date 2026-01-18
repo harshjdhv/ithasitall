@@ -133,15 +133,15 @@ export default function PdfMergePage() {
     }
 
     return (
-        <div className="min-h-screen bg-neutral-950 text-neutral-200 p-8 md:p-12 font-sans selection:bg-neutral-800">
+        <div className="min-h-screen bg-background text-foreground p-8 md:p-12 font-sans selection:bg-muted">
             <div className="max-w-[1100px] mx-auto space-y-12">
 
                 {/* Header */}
                 <div className="space-y-4">
-                    <h1 className="text-3xl font-medium tracking-tight text-white">
+                    <h1 className="text-3xl font-medium tracking-tight text-foreground">
                         Merge PDFs
                     </h1>
-                    <p className="text-lg text-neutral-500 max-w-2xl">
+                    <p className="text-lg text-muted-foreground max-w-2xl">
                         Combine multiple PDF files into a single document.
                     </p>
                 </div>
@@ -162,20 +162,20 @@ export default function PdfMergePage() {
                 flex flex-col items-center justify-center gap-4
                 transition-colors duration-200 ease-out
                 ${isDragging
-                                    ? 'border-neutral-500 bg-neutral-900'
-                                    : 'border-neutral-800 hover:border-neutral-700 bg-transparent hover:bg-neutral-900/50'
+                                    ? 'border-primary bg-muted'
+                                    : 'border-border hover:border-sidebar-ring bg-transparent hover:bg-muted/50'
                                 }
               `}
                         >
                             <div className={`
                 p-3 rounded-md transition-colors duration-200
-                ${isDragging ? 'bg-neutral-800 text-white' : 'bg-neutral-900 text-neutral-500 group-hover:text-neutral-400'}
+                ${isDragging ? 'bg-background text-foreground' : 'bg-muted text-muted-foreground group-hover:text-foreground'}
               `}>
                                 <Upload className="w-5 h-5" />
                             </div>
                             <div className="text-center space-y-1">
-                                <p className="text-sm font-medium text-neutral-300">Click or drop PDFs here</p>
-                                <p className="text-xs text-neutral-600">Supports multiple files</p>
+                                <p className="text-sm font-medium text-foreground">Click or drop PDFs here</p>
+                                <p className="text-xs text-muted-foreground">Supports multiple files</p>
                             </div>
                             <input
                                 ref={fileInputRef}
@@ -198,22 +198,22 @@ export default function PdfMergePage() {
                     {/* File List & Actions */}
                     <div className="space-y-6">
                         <div className="flex items-center justify-between">
-                            <h3 className="text-sm font-medium text-neutral-400">Files ({files.length})</h3>
+                            <h3 className="text-sm font-medium text-muted-foreground">Files ({files.length})</h3>
                             {files.length > 0 && (
                                 <button
                                     onClick={() => setFiles([])}
-                                    className="text-xs text-neutral-600 hover:text-neutral-400 transition-colors"
+                                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                                 >
                                     Clear all
                                 </button>
                             )}
                         </div>
 
-                        <div className="min-h-[200px] rounded-lg border border-neutral-800 bg-transparent p-0 overflow-hidden">
+                        <div className="min-h-[200px] rounded-lg border border-border bg-transparent p-0 overflow-hidden">
                             <div className="max-h-[500px] overflow-y-auto custom-scrollbar">
                                 <AnimatePresence initial={false} mode='popLayout'>
                                     {files.length === 0 ? (
-                                        <div className="h-64 flex flex-col items-center justify-center text-neutral-700 gap-3">
+                                        <div className="h-64 flex flex-col items-center justify-center text-muted-foreground gap-3">
                                             <FileIcon className="w-8 h-8 opacity-20" />
                                             <p className="text-sm">No files selected</p>
                                         </div>
@@ -225,35 +225,35 @@ export default function PdfMergePage() {
                                                 initial={{ opacity: 0, height: 0 }}
                                                 animate={{ opacity: 1, height: 'auto' }}
                                                 exit={{ opacity: 0, height: 0 }}
-                                                className="group flex items-center gap-3 p-3 border-b border-neutral-800/50 last:border-0 hover:bg-neutral-900/30 transition-colors"
+                                                className="group flex items-center gap-3 p-3 border-b border-border last:border-0 hover:bg-muted/30 transition-colors"
                                             >
-                                                <div className="text-neutral-600">
+                                                <div className="text-muted-foreground">
                                                     <FileText className="w-4 h-4" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="text-sm font-medium text-neutral-300 truncate">{file.name}</p>
-                                                    <p className="text-xs text-neutral-600">{file.size}</p>
+                                                    <p className="text-sm font-medium text-foreground truncate">{file.name}</p>
+                                                    <p className="text-xs text-muted-foreground">{file.size}</p>
                                                 </div>
 
                                                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <button
                                                         onClick={() => moveFile(index, 'up')}
                                                         disabled={index === 0}
-                                                        className="p-1.5 rounded hover:bg-neutral-800 text-neutral-500 hover:text-neutral-300 disabled:opacity-0"
+                                                        className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-0"
                                                     >
                                                         <ArrowUp className="w-3.5 h-3.5" />
                                                     </button>
                                                     <button
                                                         onClick={() => moveFile(index, 'down')}
                                                         disabled={index === files.length - 1}
-                                                        className="p-1.5 rounded hover:bg-neutral-800 text-neutral-500 hover:text-neutral-300 disabled:opacity-0"
+                                                        className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-0"
                                                     >
                                                         <ArrowDown className="w-3.5 h-3.5" />
                                                     </button>
-                                                    <div className="w-px h-3 bg-neutral-800 mx-1" />
+                                                    <div className="w-px h-3 bg-border mx-1" />
                                                     <button
                                                         onClick={() => removeFile(file.id)}
-                                                        className="p-1.5 rounded hover:bg-red-900/20 text-neutral-500 hover:text-red-400 transition-colors"
+                                                        className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
                                                     >
                                                         <X className="w-3.5 h-3.5" />
                                                     </button>
@@ -273,8 +273,8 @@ export default function PdfMergePage() {
                     w-full py-3 rounded-lg font-medium text-sm flex items-center justify-center gap-2
                     transition-all duration-200
                     ${files.length < 2
-                                        ? 'bg-neutral-800/50 text-neutral-600 cursor-not-allowed'
-                                        : 'bg-white text-black hover:bg-neutral-200'
+                                        ? 'bg-muted text-muted-foreground cursor-not-allowed'
+                                        : 'bg-primary text-primary-foreground hover:bg-primary/90'
                                     }
                 `}
                             >
