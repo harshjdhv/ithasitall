@@ -1,31 +1,78 @@
-# shadcn/ui monorepo template
+<div align="center">
 
-This template is for creating a monorepo with shadcn/ui.
+# ithasitall
 
-## Usage
+**A clean, client-side toolbox of essential developer utilities.**
 
-```bash
-pnpm dlx shadcn@latest init
-```
+Fast. Private. Calm.
 
-## Adding components
+</div>
 
-To add components to your app, run the following command at the root of your `web` app:
+---
 
-```bash
-pnpm dlx shadcn@latest add button -c apps/web
-```
+## What is ithasitall?
 
-This will place the ui components in the `packages/ui/src/components` directory.
+ithasitall is a collection of small, essential developer tools that run **entirely in your browser**.
 
-## Tailwind
+No backend. No accounts. No tracking.
+Just tools that work.
 
-Your `tailwind.config.ts` and `globals.css` are already set up to use the components from the `ui` package.
+---
 
-## Using components
+## Why it exists
 
-To use the components in your app, import them from the `ui` package.
+Developers constantly need quick utilities:
 
-```tsx
-import { Button } from "@workspace/ui/components/button"
-```
+* format JSON
+* decode tokens
+* generate IDs
+* convert data
+
+Most solutions are slow, noisy, or untrustworthy.
+
+ithasitall aims to be the opposite — **quiet, fast, and reliable**.
+
+---
+
+## Core principles
+
+* **Client-side only** — everything runs locally
+* **Privacy-first** — nothing leaves your machine
+* **Tool-first UX** — no landing pages, no fluff
+* **Minimal & premium** — design stays out of the way
+
+---
+
+## Status
+
+This project is in early development.
+
+The focus right now is:
+
+* building a solid foundation
+* defining strict UI and UX rules
+* shipping small tools consistently
+
+---
+
+## Tech (early)
+
+* Next.js
+* React
+* TypeScript
+* Tailwind CSS
+
+---
+
+## Philosophy
+
+ithasitall is intentionally opinionated.
+
+It is not trying to impress.
+It is trying to be useful.
+
+---
+
+## License
+
+MIT
