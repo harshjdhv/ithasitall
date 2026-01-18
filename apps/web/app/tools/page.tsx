@@ -134,7 +134,7 @@ const ToolsPage = () => {
     ];
 
     return (
-        <div className="max-w-[1100px] mx-auto py-12 px-6">
+        <div className="max-w-[1100px] mx-auto py-12 px-1 md:px-6">
             <div className="mb-16">
                 <h1 className="text-3xl font-medium text-neutral-900 dark:text-white mb-4">Overview</h1>
                 <p className="text-neutral-500 dark:text-neutral-400 text-lg max-w-2xl leading-relaxed">

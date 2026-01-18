@@ -133,7 +133,7 @@ export default function PdfMergePage() {
     }
 
     return (
-        <div className="min-h-screen bg-background text-foreground p-8 md:p-12 font-sans selection:bg-muted">
+        <div className="min-h-screen bg-background text-foreground p-1 md:p-12 font-sans selection:bg-muted">
             <div className="max-w-[1100px] mx-auto space-y-12">
 
                 {/* Header */}
