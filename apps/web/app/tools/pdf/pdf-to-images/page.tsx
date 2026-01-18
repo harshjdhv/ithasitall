@@ -2,7 +2,6 @@
 
 import React, { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
-import * as pdfjsLib from 'pdfjs-dist'
 import {
     ImageIcon,
     Download,
@@ -11,12 +10,16 @@ import {
     FileIcon
 } from 'lucide-react'
 
-// Set worker source
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`
-
 interface PageItem {
     index: number;
     thumbnail: string;
+}
+
+// Helper to get pdfjs-dist dynamically (client-side only)
+const getPdfJs = async () => {
+    const pdfjsLib = await import('pdfjs-dist')
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`
+    return pdfjsLib
 }
 
 export default function PdfToImagesPage() {
@@ -39,6 +42,7 @@ export default function PdfToImagesPage() {
         setIsProcessing(true)
 
         try {
+            const pdfjsLib = await getPdfJs()
             const arrayBuffer = await uploadedFile.arrayBuffer()
             const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer })
             const pdf = await loadingTask.promise
@@ -90,7 +94,10 @@ export default function PdfToImagesPage() {
         setError(null)
 
         try {
-            const JSZip = (await import('jszip')).default
+            const [pdfjsLib, JSZip] = await Promise.all([
+                getPdfJs(),
+                import('jszip').then(m => m.default)
+            ])
             const zip = new JSZip()
 
             const arrayBuffer = await file.arrayBuffer()

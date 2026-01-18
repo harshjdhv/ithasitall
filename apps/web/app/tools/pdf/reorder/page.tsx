@@ -3,7 +3,6 @@
 import React, { useState, useRef } from 'react'
 import { Reorder } from 'framer-motion'
 import { PDFDocument } from 'pdf-lib'
-import * as pdfjsLib from 'pdfjs-dist'
 import {
     ArrowLeftRight,
     Download,
@@ -13,8 +12,12 @@ import {
     GripVertical
 } from 'lucide-react'
 
-// Set worker source
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`
+// Helper to get pdfjs-dist dynamically (client-side only)
+const getPdfJs = async () => {
+    const pdfjsLib = await import('pdfjs-dist')
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`
+    return pdfjsLib
+}
 
 interface PageItem {
     id: string;
@@ -41,6 +44,7 @@ export default function PdfReorderPage() {
         setIsProcessing(true)
 
         try {
+            const pdfjsLib = await getPdfJs()
             const arrayBuffer = await uploadedFile.arrayBuffer()
             const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer })
             const pdf = await loadingTask.promise
