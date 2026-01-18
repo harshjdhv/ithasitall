@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 import {
     FileText,
     Image as ImageIcon,
@@ -26,17 +27,29 @@ import {
     Scissors
 } from 'lucide-react'
 
-const ToolGroup = ({ title, tools }: { title: string; tools: { name: string; icon: React.ReactNode }[] }) => (
+const ToolGroup = ({ title, tools }: { title: string; tools: { name: string; icon: React.ReactNode; href?: string }[] }) => (
     <div className="mb-12">
         <h2 className="text-xl font-medium text-neutral-900 dark:text-neutral-200 mb-4">{title}</h2>
         <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {tools.map((tool) => (
                 <li
                     key={tool.name}
-                    className="p-4 border border-neutral-200 dark:border-neutral-800 rounded-lg bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 text-sm hover:border-neutral-300 dark:hover:border-neutral-700 transition-colors cursor-default flex items-center gap-3"
+                    className="group"
                 >
-                    <span className="text-neutral-400 dark:text-neutral-500">{tool.icon}</span>
-                    {tool.name}
+                    {tool.href ? (
+                        <Link
+                            href={tool.href}
+                            className="p-4 border border-neutral-200 dark:border-neutral-800 rounded-lg bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 text-sm hover:border-neutral-300 dark:hover:border-neutral-700 transition-colors flex items-center gap-3 cursor-pointer"
+                        >
+                            <span className="text-neutral-400 dark:text-neutral-500 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors">{tool.icon}</span>
+                            {tool.name}
+                        </Link>
+                    ) : (
+                        <div className="p-4 border border-neutral-200 dark:border-neutral-800 rounded-lg bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 text-sm opacity-60 flex items-center gap-3 cursor-not-allowed">
+                            <span className="text-neutral-400 dark:text-neutral-500">{tool.icon}</span>
+                            {tool.name}
+                        </div>
+                    )}
                 </li>
             ))}
         </ul>
@@ -50,12 +63,12 @@ const ToolsPage = () => {
         {
             title: "PDF Tools",
             tools: [
-                { name: "PDF Merge", icon: <FileText {...iconProps} /> },
-                { name: "PDF Compress", icon: <FileText {...iconProps} /> },
-                { name: "PDF Split", icon: <Scissors {...iconProps} /> },
-                { name: "Images → PDF", icon: <ImageIcon {...iconProps} /> },
-                { name: "PDF → Images", icon: <FileText {...iconProps} /> },
-                { name: "PDF Page Reorder", icon: <FileText {...iconProps} /> }
+                { name: "PDF Merge", icon: <FileText {...iconProps} />, href: "/tools/pdf/merge" },
+                { name: "PDF Compress", icon: <FileText {...iconProps} />, href: "/tools/pdf/compress" },
+                { name: "PDF Split", icon: <Scissors {...iconProps} />, href: "/tools/pdf/split" },
+                { name: "Images → PDF", icon: <ImageIcon {...iconProps} />, href: "/tools/pdf/images-to-pdf" },
+                { name: "PDF → Images", icon: <FileText {...iconProps} />, href: "/tools/pdf/pdf-to-images" },
+                { name: "PDF Page Reorder", icon: <FileText {...iconProps} />, href: "/tools/pdf/reorder" }
             ]
         },
         {

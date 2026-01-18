@@ -14,32 +14,31 @@ export const toolsConfig = {
       ],
     },
     {
-      title: "Core Concepts",
+      title: "PDF Tools",
       items: [
         {
-          title: "Philosophy",
-          href: "/tools/philosophy",
+          title: "PDF Merge",
+          href: "/tools/pdf/merge",
         },
         {
-          title: "Theming",
-          href: "/tools/theming",
-        },
-      ],
-    },
-    {
-      title: "Tools & Utilities",
-      items: [
-        {
-          title: "CLI Reference",
-          href: "/tools/cli",
+          title: "PDF Compress",
+          href: "/tools/pdf/compress",
         },
         {
-          title: "Linting Rules",
-          href: "/tools/linting",
+          title: "PDF Split",
+          href: "/tools/pdf/split",
         },
         {
-          title: "CI/CD Setup",
-          href: "/tools/cicd",
+          title: "Images to PDF",
+          href: "/tools/pdf/images-to-pdf",
+        },
+        {
+          title: "PDF to Images",
+          href: "/tools/pdf/pdf-to-images",
+        },
+        {
+          title: "Page Reorder",
+          href: "/tools/pdf/reorder",
         },
       ],
     },

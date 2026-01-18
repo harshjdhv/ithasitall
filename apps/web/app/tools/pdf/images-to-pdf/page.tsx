@@ -1,0 +1,1 @@
+import React from 'react'; export default function Page() { return <div className='max-w-[800px] mx-auto py-12 px-6'><h1 className='text-3xl font-medium text-neutral-900 dark:text-white mb-4'>Images to PDF</h1><p className='text-neutral-500 dark:text-neutral-400 text-lg'>Coming soon...</p></div> }
