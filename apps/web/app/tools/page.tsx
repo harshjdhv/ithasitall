@@ -74,11 +74,11 @@ const ToolsPage = () => {
         {
             title: "File & Media Utilities",
             tools: [
-                { name: "Image Compress", icon: <ImageIcon {...iconProps} /> },
-                { name: "Image Resize", icon: <ImageIcon {...iconProps} /> },
-                { name: "Image Format Converter", icon: <ImageIcon {...iconProps} /> },
-                { name: "Video Downloader", icon: <Video {...iconProps} /> },
-                { name: "Audio Extract from Video", icon: <Music {...iconProps} /> }
+                { name: "Image Compress", icon: <ImageIcon {...iconProps} />, href: "/tools/files/image-compress" },
+                { name: "Image Resize", icon: <ImageIcon {...iconProps} />, href: "/tools/files/image-resize" },
+                { name: "Image Format Converter", icon: <ImageIcon {...iconProps} />, href: "/tools/files/image-converter" },
+                { name: "Video Downloader", icon: <Video {...iconProps} />, href: "/tools/files/video-downloader" },
+                { name: "Audio Extract from Video", icon: <Music {...iconProps} />, href: "/tools/files/audio-extract" }
             ]
         },
         {
@@ -135,14 +135,6 @@ const ToolsPage = () => {
 
     return (
         <div className="max-w-[1100px] mx-auto py-12 px-1 md:px-6">
-            <div className="mb-16">
-                <h1 className="text-3xl font-medium text-neutral-900 dark:text-white mb-4">Overview</h1>
-                <p className="text-neutral-500 dark:text-neutral-400 text-lg max-w-2xl leading-relaxed">
-                    A clean, client-side toolbox of essential developer utilities. <br />
-                    Fast. Private. Calm.
-                </p>
-            </div>
-
             <div className="space-y-4">
                 {toolCategories.map((category) => (
                     <ToolGroup key={category.title} title={category.title} tools={category.tools} />

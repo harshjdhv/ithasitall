@@ -38,5 +38,30 @@ export const toolsConfig = {
         },
       ],
     },
+    {
+      title: "File & Media",
+      items: [
+        {
+          title: "Image Compress",
+          href: "/tools/files/image-compress",
+        },
+        {
+          title: "Image Resize",
+          href: "/tools/files/image-resize",
+        },
+        {
+          title: "Format Converter",
+          href: "/tools/files/image-converter",
+        },
+        {
+          title: "Video Downloader",
+          href: "/tools/files/video-downloader",
+        },
+        {
+          title: "Audio Extract",
+          href: "/tools/files/audio-extract",
+        },
+      ],
+    },
   ],
 };
