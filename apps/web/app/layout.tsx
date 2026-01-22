@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google"
 import type { Viewport } from "next"
+import { Analytics } from "@vercel/analytics/next"
 
 import "@workspace/ui/globals.css"
 import { Providers } from "@/components/providers"
@@ -51,6 +52,7 @@ export default function RootLayout({
             </div>
           </div>
         </Providers>
+        <Analytics />
       </body>
     </html>
   )
