@@ -310,7 +310,7 @@ const ToolsPage = () => {
   ];
 
   return (
-    <div className="max-w-3xl mx-auto py-12 px-6">
+    <div className="max-w-3xl mx-auto py-1 px-1 md:py-12 md:px-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
