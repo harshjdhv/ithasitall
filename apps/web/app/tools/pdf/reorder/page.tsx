@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useRef } from 'react'
+import Link from 'next/link'
 import { Reorder } from 'framer-motion'
 import { PDFDocument } from 'pdf-lib'
 import {
@@ -9,8 +10,13 @@ import {
     AlertCircle,
     Loader2,
     FileIcon,
-    GripVertical
+    GripVertical,
+    Upload,
+    ArrowLeft,
+    RotateCw,
+    Trash2
 } from 'lucide-react'
+import { cn } from "@/lib/utils"
 
 // Helper to get pdfjs-dist dynamically (client-side only)
 const getPdfJs = async () => {
@@ -125,122 +131,160 @@ export default function PdfReorderPage() {
         }
     }
 
-    return (
-        <div className="min-h-screen bg-background text-foreground p-1 md:p-12 font-sans selection:bg-muted">
-            <div className="max-w-[1100px] mx-auto space-y-12">
+    // Custom CSS for reorder grid which needs to break out of flex/grid standard slightly for Reorder to work smoothly
+    // We'll use a flex wrap approach for the list
 
-                {/* Header */}
-                <div className="space-y-4">
-                    <h1 className="text-3xl font-medium tracking-tight text-foreground">
-                        Reorder PDF Pages
-                    </h1>
-                    <p className="text-lg text-muted-foreground max-w-2xl">
-                        Drag and drop thumbnails to rearrange pages in your PDF document.
-                    </p>
+    return (
+        <div className="animate-in fade-in duration-500">
+            {/* Back Navigation */}
+            <div className="max-w-3xl mx-auto mb-6">
+                <Link
+                    href="/tools"
+                    className="inline-flex items-center text-sm text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200 transition-colors"
+                >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to Tools
+                </Link>
+            </div>
+
+            <div className="max-w-3xl mx-auto space-y-6">
+                {/* Navigation & Header */}
+                <div className="space-y-4 text-center">
+                    <div className="space-y-2">
+                        <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-red-500/10 text-red-500 mb-2">
+                            <ArrowLeftRight className="w-8 h-8" />
+                        </div>
+                        <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white sm:text-4xl">
+                            Reorder PDF Pages
+                        </h1>
+                        <p className="text-lg text-neutral-500 dark:text-neutral-400 max-w-lg mx-auto">
+                            Drag and drop thumbnails to rearrange pages in your PDF document.
+                        </p>
+                    </div>
                 </div>
 
-                {/* Main Content */}
-                <div className="space-y-8 min-h-[60vh]">
+                {/* Main Card */}
+                <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-sm overflow-hidden">
 
-                    {/* Upload Area (Top if empty) */}
-                    {!file && (
-                        <div
-                            onClick={() => fileInputRef.current?.click()}
-                            onDragOver={(e) => e.preventDefault()}
-                            onDrop={handleDrop}
-                            className="relative group cursor-pointer border border-dashed border-border hover:border-sidebar-ring bg-transparent hover:bg-muted/50 rounded-lg h-64 flex flex-col items-center justify-center gap-4 transition-colors duration-200 ease-out"
-                        >
-                            <div className="p-3 rounded-md bg-muted text-muted-foreground group-hover:text-foreground transition-colors duration-200">
-                                <ArrowLeftRight className="w-5 h-5" />
-                            </div>
-                            <div className="text-center space-y-1">
-                                <p className="text-sm font-medium text-foreground">Click or drop PDF here to reorder</p>
-                            </div>
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                accept="application/pdf"
-                                className="hidden"
-                                onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
-                            />
+                    {/* Toolbar / Header within card */}
+                    <div className="p-4 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between bg-neutral-50/50 dark:bg-neutral-900/50">
+                        <div className="text-sm font-medium text-neutral-600 dark:text-neutral-300">
+                            {file ? `${pages.length} pages loaded` : 'No file selected'}
                         </div>
-                    )}
+                        {file && (
+                            <button
+                                onClick={() => { setFile(null); setPages([]); }}
+                                className="text-xs px-3 py-1.5 rounded-md text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors font-medium"
+                            >
+                                Remove File
+                            </button>
+                        )}
+                    </div>
 
-                    {/* Toolbar */}
-                    {file && (
-                        <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-muted/20">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-background rounded text-foreground">
-                                    <FileIcon className="w-5 h-5" />
+                    <div className="p-6 md:p-8 space-y-6">
+                        {!file ? (
+                            <div
+                                onClick={() => fileInputRef.current?.click()}
+                                onDragOver={(e) => e.preventDefault()}
+                                onDrop={handleDrop}
+                                className="relative group cursor-pointer rounded-xl border-2 border-dashed border-neutral-200 dark:border-neutral-800 hover:border-red-400 dark:hover:border-red-600 hover:bg-neutral-50 dark:hover:bg-neutral-900/50 transition-all duration-200 ease-out flex flex-col items-center justify-center gap-4 py-8 px-4"
+                            >
+                                <div className="p-4 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-200">
+                                    <Upload className="w-8 h-8" />
                                 </div>
-                                <div>
-                                    <p className="text-sm font-medium text-foreground">{file.name}</p>
-                                    <p className="text-xs text-muted-foreground">{pages.length} pages</p>
+                                <div className="text-center space-y-1">
+                                    <p className="text-base font-semibold text-neutral-900 dark:text-white">
+                                        Click to upload or drag and drop
+                                    </p>
+                                    <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                                        PDF files only
+                                    </p>
                                 </div>
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="application/pdf"
+                                    className="hidden"
+                                    onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+                                />
                             </div>
-                            <div className="flex items-center gap-3">
-                                <button
-                                    onClick={() => { setFile(null); setPages([]); }}
-                                    className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={savePdf}
-                                    disabled={isProcessing}
-                                    className="px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-md hover:bg-primary/90 transition-colors flex items-center gap-2"
-                                >
-                                    {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-                                    Save PDF
-                                </button>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Grid */}
-                    {file && pages.length > 0 && (
-                        <Reorder.Group
-                            axis="y"
-                            onReorder={setPages}
-                            values={pages}
-                            className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"
-                            as="ul"
-                        >
-                            {pages.map((page, index) => (
-                                <Reorder.Item
-                                    key={page.id}
-                                    value={page}
-                                    className="relative group cursor-grab active:cursor-grabbing"
-                                >
-                                    <div className="aspect-[1/1.4] bg-muted border border-border rounded-lg overflow-hidden relative shadow-sm group-hover:border-sidebar-ring transition-colors">
-                                        <span className="absolute top-2 left-2 w-6 h-6 flex items-center justify-center bg-background/80 backdrop-blur-sm text-foreground text-xs rounded-full z-10 font-medium shadow-sm">
-                                            {index + 1}
-                                        </span>
-                                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                                        <img src={page.thumbnail} alt={`Page ${page.originalIndex + 1}`} className="w-full h-full object-contain p-2" />
-                                        <div className="absolute inset-0 bg-background/0 group-hover:bg-background/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                            <GripVertical className="text-foreground drop-shadow-md" />
-                                        </div>
+                        ) : (
+                            <div className="space-y-6">
+                                {/* Grid */}
+                                {pages.length > 0 && (
+                                    <div className="bg-neutral-100 dark:bg-neutral-800/50 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 max-h-[500px] overflow-y-auto custom-scrollbar">
+                                        <Reorder.Group
+                                            axis="y"
+                                            onReorder={setPages}
+                                            values={pages}
+                                            className="grid grid-cols-2 md:grid-cols-4 gap-4"
+                                            as="ul"
+                                        >
+                                            {pages.map((page, index) => (
+                                                <Reorder.Item
+                                                    key={page.id}
+                                                    value={page}
+                                                    className="relative group cursor-grab active:cursor-grabbing list-none"
+                                                >
+                                                    <div className="aspect-[1/1.4] bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg overflow-hidden relative shadow-sm group-hover:border-red-400 group-hover:shadow-md transition-all">
+                                                        <span className="absolute top-2 left-2 w-6 h-6 flex items-center justify-center bg-black/50 text-white text-xs rounded-full z-10 font-bold backdrop-blur-sm">
+                                                            {index + 1}
+                                                        </span>
+                                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                        <img src={page.thumbnail} alt={`Page ${page.originalIndex + 1}`} className="w-full h-full object-contain p-2" />
+                                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                                            <div className="p-2 bg-white rounded-full shadow-lg">
+                                                                <GripVertical className="text-neutral-600 w-5 h-5" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </Reorder.Item>
+                                            ))}
+                                        </Reorder.Group>
                                     </div>
-                                </Reorder.Item>
-                            ))}
-                        </Reorder.Group>
-                    )}
+                                )}
 
-                    {isProcessing && file && pages.length === 0 && (
-                        <div className="flex flex-col items-center justify-center py-20 text-muted-foreground gap-4">
-                            <Loader2 className="w-8 h-8 animate-spin" />
-                            <p>Rendering pages...</p>
-                        </div>
-                    )}
+                                {isProcessing && pages.length === 0 && (
+                                    <div className="flex flex-col items-center justify-center py-12 text-neutral-500 gap-4">
+                                        <Loader2 className="w-8 h-8 animate-spin text-red-500" />
+                                        <p>Rendering pages...</p>
+                                    </div>
+                                )}
 
-                    {error && (
-                        <div className="p-3 rounded-md bg-red-500/10 border border-red-500/10 text-red-400 text-sm flex items-center gap-2 mx-auto max-w-lg">
-                            <AlertCircle className="w-4 h-4" />
-                            {error}
-                        </div>
-                    )}
+                                <div className="flex flex-col gap-3">
+                                    <button
+                                        onClick={savePdf}
+                                        disabled={isProcessing || pages.length === 0}
+                                        className={cn(
+                                            "w-full py-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-200",
+                                            isProcessing || pages.length === 0
+                                                ? "bg-neutral-100 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed"
+                                                : "bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-500/20 hover:shadow-red-500/40 active:scale-[0.98]"
+                                        )}
+                                    >
+                                        {isProcessing && pages.length > 0 ? (
+                                            <>
+                                                <Loader2 className="w-5 h-5 animate-spin" />
+                                                Processing...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Download className="w-5 h-5" />
+                                                Save Reordered PDF
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+                        )}
 
+                        {error && (
+                            <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 text-red-600 dark:text-red-400 text-sm flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+                                <AlertCircle className="w-4 h-4 shrink-0" />
+                                {error}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

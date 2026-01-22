@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useRef } from 'react'
+import Link from 'next/link'
 import { PDFDocument } from 'pdf-lib'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -12,8 +13,12 @@ import {
     Download,
     AlertCircle,
     Loader2,
-    FileIcon
+    FileIcon,
+    ArrowLeft,
+    Trash2,
+    Plus
 } from 'lucide-react'
+import { cn } from "@/lib/utils"
 
 interface PdfFile {
     id: string;
@@ -133,49 +138,90 @@ export default function PdfMergePage() {
     }
 
     return (
-        <div className="min-h-screen bg-background text-foreground p-1 md:p-12 font-sans selection:bg-muted">
-            <div className="max-w-[1100px] mx-auto space-y-12">
+        <div className="animate-in fade-in duration-500">
+            {/* Back Navigation */}
+            <div className="max-w-3xl mx-auto mb-6">
+                <Link
+                    href="/tools"
+                    className="inline-flex items-center text-sm text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200 transition-colors"
+                >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to Tools
+                </Link>
+            </div>
 
-                {/* Header */}
-                <div className="space-y-4">
-                    <h1 className="text-3xl font-medium tracking-tight text-foreground">
-                        Merge PDFs
-                    </h1>
-                    <p className="text-lg text-muted-foreground max-w-2xl">
-                        Combine multiple PDF files into a single document.
-                    </p>
+            <div className="max-w-3xl mx-auto space-y-6">
+
+                {/* Navigation & Header */}
+                <div className="space-y-4 text-center">
+                    <div className="space-y-2">
+                        <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-red-500/10 text-red-500 mb-2">
+                            <FileText className="w-8 h-8" />
+                        </div>
+                        <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white sm:text-4xl">
+                            Merge PDF
+                        </h1>
+                        <p className="text-lg text-neutral-500 dark:text-neutral-400 max-w-lg mx-auto">
+                            Combine multiple PDF files into a single document. Drag and drop to reorder.
+                        </p>
+                    </div>
                 </div>
 
-                {/* Main Content */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                {/* Main Card */}
+                <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-sm overflow-hidden">
 
-                    {/* Upload Area */}
-                    <div className="space-y-4">
+                    {/* Toolbar */}
+                    <div className="p-4 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between bg-neutral-50/50 dark:bg-neutral-900/50">
+                        <div className="text-sm font-medium text-neutral-600 dark:text-neutral-300">
+                            {files.length} {files.length === 1 ? 'file' : 'files'} selected
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            {files.length > 0 && (
+                                <button
+                                    onClick={() => setFiles([])}
+                                    className="text-xs px-3 py-1.5 rounded-md text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors font-medium"
+                                >
+                                    Clear All
+                                </button>
+                            )}
+                            <button
+                                onClick={() => fileInputRef.current?.click()}
+                                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-sm font-medium hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors"
+                            >
+                                <Plus className="w-4 h-4" />
+                                Add Files
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="p-6 md:p-8 space-y-6">
+                        {/* Drop Zone */}
                         <div
                             onClick={() => fileInputRef.current?.click()}
                             onDragOver={handleDragOver}
                             onDragLeave={handleDragLeave}
                             onDrop={handleDrop}
-                            className={`
-                relative group cursor-pointer
-                border border-dashed rounded-lg h-64
-                flex flex-col items-center justify-center gap-4
-                transition-colors duration-200 ease-out
-                ${isDragging
-                                    ? 'border-primary bg-muted'
-                                    : 'border-border hover:border-sidebar-ring bg-transparent hover:bg-muted/50'
-                                }
-              `}
+                            className={cn(
+                                "relative group cursor-pointer rounded-xl border-2 border-dashed transition-all duration-200 ease-out flex flex-col items-center justify-center gap-4 py-8 px-4",
+                                isDragging
+                                    ? "border-red-500 bg-red-50 dark:bg-red-900/10"
+                                    : "border-neutral-200 dark:border-neutral-800 hover:border-red-400 dark:hover:border-red-600 hover:bg-neutral-50 dark:hover:bg-neutral-900/50"
+                            )}
                         >
-                            <div className={`
-                p-3 rounded-md transition-colors duration-200
-                ${isDragging ? 'bg-background text-foreground' : 'bg-muted text-muted-foreground group-hover:text-foreground'}
-              `}>
-                                <Upload className="w-5 h-5" />
+                            <div className={cn(
+                                "p-4 rounded-full transition-colors duration-200",
+                                isDragging ? "bg-red-100 text-red-600" : "bg-neutral-100 dark:bg-neutral-800 text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300"
+                            )}>
+                                <Upload className="w-8 h-8" />
                             </div>
                             <div className="text-center space-y-1">
-                                <p className="text-sm font-medium text-foreground">Click or drop PDFs here</p>
-                                <p className="text-xs text-muted-foreground">Supports multiple files</p>
+                                <p className="text-base font-semibold text-neutral-900 dark:text-white">
+                                    Click to upload or drag and drop
+                                </p>
+                                <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                                    PDF files only
+                                </p>
                             </div>
                             <input
                                 ref={fileInputRef}
@@ -188,105 +234,89 @@ export default function PdfMergePage() {
                         </div>
 
                         {error && (
-                            <div className="p-3 rounded-md bg-red-500/10 border border-red-500/10 text-red-400 text-sm flex items-center gap-2">
-                                <AlertCircle className="w-4 h-4" />
+                            <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 text-red-600 dark:text-red-400 text-sm flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+                                <AlertCircle className="w-4 h-4 shrink-0" />
                                 {error}
                             </div>
                         )}
-                    </div>
 
-                    {/* File List & Actions */}
-                    <div className="space-y-6">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-sm font-medium text-muted-foreground">Files ({files.length})</h3>
-                            {files.length > 0 && (
-                                <button
-                                    onClick={() => setFiles([])}
-                                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                                >
-                                    Clear all
-                                </button>
-                            )}
-                        </div>
-
-                        <div className="min-h-[200px] rounded-lg border border-border bg-transparent p-0 overflow-hidden">
-                            <div className="max-h-[500px] overflow-y-auto custom-scrollbar">
-                                <AnimatePresence initial={false} mode='popLayout'>
-                                    {files.length === 0 ? (
-                                        <div className="h-64 flex flex-col items-center justify-center text-muted-foreground gap-3">
-                                            <FileIcon className="w-8 h-8 opacity-20" />
-                                            <p className="text-sm">No files selected</p>
+                        {/* File List */}
+                        <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                            <AnimatePresence initial={false} mode='popLayout'>
+                                {files.map((file, index) => (
+                                    <motion.div
+                                        key={file.id}
+                                        layout
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, scale: 0.95 }}
+                                        className="group relative flex items-center gap-4 p-3 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:shadow-sm transition-all"
+                                    >
+                                        <div className="w-10 h-10 rounded-lg bg-red-50 dark:bg-red-900/10 text-red-500 flex items-center justify-center shrink-0">
+                                            <FileIcon className="w-5 h-5" />
                                         </div>
-                                    ) : (
-                                        files.map((file, index) => (
-                                            <motion.div
-                                                key={file.id}
-                                                layout
-                                                initial={{ opacity: 0, height: 0 }}
-                                                animate={{ opacity: 1, height: 'auto' }}
-                                                exit={{ opacity: 0, height: 0 }}
-                                                className="group flex items-center gap-3 p-3 border-b border-border last:border-0 hover:bg-muted/30 transition-colors"
-                                            >
-                                                <div className="text-muted-foreground">
-                                                    <FileText className="w-4 h-4" />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <p className="text-sm font-medium text-foreground truncate">{file.name}</p>
-                                                    <p className="text-xs text-muted-foreground">{file.size}</p>
-                                                </div>
 
-                                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <button
-                                                        onClick={() => moveFile(index, 'up')}
-                                                        disabled={index === 0}
-                                                        className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-0"
-                                                    >
-                                                        <ArrowUp className="w-3.5 h-3.5" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => moveFile(index, 'down')}
-                                                        disabled={index === files.length - 1}
-                                                        className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-0"
-                                                    >
-                                                        <ArrowDown className="w-3.5 h-3.5" />
-                                                    </button>
-                                                    <div className="w-px h-3 bg-border mx-1" />
-                                                    <button
-                                                        onClick={() => removeFile(file.id)}
-                                                        className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
-                                                    >
-                                                        <X className="w-3.5 h-3.5" />
-                                                    </button>
-                                                </div>
-                                            </motion.div>
-                                        ))
-                                    )}
-                                </AnimatePresence>
-                            </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100 truncate">
+                                                {file.name}
+                                            </p>
+                                            <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                                                {file.size}
+                                            </p>
+                                        </div>
+
+                                        <div className="flex items-center gap-1">
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); moveFile(index, 'up') }}
+                                                disabled={index === 0}
+                                                className="p-1.5 rounded-md text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 disabled:opacity-30 transition-colors"
+                                                title="Move Up"
+                                            >
+                                                <ArrowUp className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); moveFile(index, 'down') }}
+                                                disabled={index === files.length - 1}
+                                                className="p-1.5 rounded-md text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 disabled:opacity-30 transition-colors"
+                                                title="Move Down"
+                                            >
+                                                <ArrowDown className="w-4 h-4" />
+                                            </button>
+                                            <div className="w-px h-4 bg-neutral-200 dark:bg-neutral-800 mx-1" />
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); removeFile(file.id) }}
+                                                className="p-1.5 rounded-md text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                                                title="Remove"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
                         </div>
 
+                        {/* Merge Button */}
                         <div className="pt-2">
                             <button
                                 onClick={mergePdfs}
                                 disabled={files.length < 2 || isMerging}
-                                className={`
-                    w-full py-3 rounded-lg font-medium text-sm flex items-center justify-center gap-2
-                    transition-all duration-200
-                    ${files.length < 2
-                                        ? 'bg-muted text-muted-foreground cursor-not-allowed'
-                                        : 'bg-primary text-primary-foreground hover:bg-primary/90'
-                                    }
-                `}
+                                className={cn(
+                                    "w-full py-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-200",
+                                    files.length < 2 || isMerging
+                                        ? "bg-neutral-100 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed"
+                                        : "bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-500/20 hover:shadow-red-500/40 active:scale-[0.98]"
+                                )}
                             >
                                 {isMerging ? (
                                     <>
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                        Processing...
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        Merging PDFs...
                                     </>
                                 ) : (
                                     <>
-                                        <Download className="w-4 h-4" />
-                                        Merge PDF
+                                        <Download className="w-5 h-5" />
+                                        Merge PDFs
                                     </>
                                 )}
                             </button>

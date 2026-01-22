@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useRef } from 'react'
+import Link from 'next/link'
 import { PDFDocument } from 'pdf-lib'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -9,8 +10,12 @@ import {
     AlertCircle,
     Loader2,
     FileIcon,
-    X
+    X,
+    Upload,
+    ArrowLeft,
+    FileText
 } from 'lucide-react'
+import { cn } from "@/lib/utils"
 
 interface PdfFile {
     file: File;
@@ -21,7 +26,6 @@ interface PdfFile {
 
 export default function PdfSplitPage() {
     const [file, setFile] = useState<PdfFile | null>(null)
-    const [isDragging, setIsDragging] = useState(false)
     const [isProcessing, setIsProcessing] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [splitMode, setSplitMode] = useState<'all' | 'range'>('all')
@@ -59,19 +63,8 @@ export default function PdfSplitPage() {
         }
     }
 
-    const handleDragOver = (e: React.DragEvent) => {
-        e.preventDefault()
-        setIsDragging(true)
-    }
-
-    const handleDragLeave = (e: React.DragEvent) => {
-        e.preventDefault()
-        setIsDragging(false)
-    }
-
     const handleDrop = (e: React.DragEvent) => {
         e.preventDefault()
-        setIsDragging(false)
         if (e.dataTransfer.files?.[0]) {
             handleFile(e.dataTransfer.files[0])
         }
@@ -115,8 +108,6 @@ export default function PdfSplitPage() {
             const srcDoc = await PDFDocument.load(arrayBuffer)
 
             if (splitMode === 'all') {
-                // Create a Zip (need JSZip, assuming global or dynamic import if strictly no other lib allowed but user has pdf-lib)
-                // Wait, the user has jszip installed now.
                 const JSZip = (await import('jszip')).default
                 const zip = new JSZip()
 
@@ -175,49 +166,71 @@ export default function PdfSplitPage() {
     }
 
     return (
-        <div className="min-h-screen bg-background text-foreground p-1 md:p-12 font-sans selection:bg-muted">
-            <div className="max-w-[1100px] mx-auto space-y-12">
+        <div className="animate-in fade-in duration-500">
+            {/* Back Navigation */}
+            <div className="max-w-3xl mx-auto mb-6">
+                <Link
+                    href="/tools"
+                    className="inline-flex items-center text-sm text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200 transition-colors"
+                >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to Tools
+                </Link>
+            </div>
 
-                {/* Header */}
-                <div className="space-y-4">
-                    <h1 className="text-3xl font-medium tracking-tight text-foreground">
-                        Split PDF
-                    </h1>
-                    <p className="text-lg text-muted-foreground max-w-2xl">
-                        Extract pages from your PDF files or split them into individual documents.
-                    </p>
+            <div className="max-w-3xl mx-auto space-y-6">
+
+                {/* Navigation & Header */}
+                <div className="space-y-4 text-center">
+                    <div className="space-y-2">
+                        <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-red-500/10 text-red-500 mb-2">
+                            <Scissors className="w-8 h-8" />
+                        </div>
+                        <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white sm:text-4xl">
+                            Split PDF
+                        </h1>
+                        <p className="text-lg text-neutral-500 dark:text-neutral-400 max-w-lg mx-auto">
+                            Extract pages from your PDF or save each page as a separate file.
+                        </p>
+                    </div>
                 </div>
 
-                {/* Main Content */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                {/* Main Card */}
+                <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-sm overflow-hidden">
 
-                    {/* Upload Area */}
-                    <div className="space-y-4">
+                    {/* Toolbar / Header within card */}
+                    <div className="p-4 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between bg-neutral-50/50 dark:bg-neutral-900/50">
+                        <div className="text-sm font-medium text-neutral-600 dark:text-neutral-300">
+                            {file ? '1 file selected' : 'No file selected'}
+                        </div>
+                        {file && (
+                            <button
+                                onClick={() => { setFile(null); setSplitMode('all'); setRangeInput(''); }}
+                                className="text-xs px-3 py-1.5 rounded-md text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors font-medium"
+                            >
+                                Remove File
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="p-6 md:p-8 space-y-6">
                         {!file ? (
                             <div
                                 onClick={() => fileInputRef.current?.click()}
-                                onDragOver={handleDragOver}
-                                onDragLeave={handleDragLeave}
+                                onDragOver={(e) => e.preventDefault()}
                                 onDrop={handleDrop}
-                                className={`
-                  relative group cursor-pointer
-                  border border-dashed rounded-lg h-64
-                  flex flex-col items-center justify-center gap-4
-                  transition-colors duration-200 ease-out
-                  ${isDragging
-                                        ? 'border-primary bg-muted'
-                                        : 'border-border hover:border-sidebar-ring bg-transparent hover:bg-muted/50'
-                                    }
-                `}
+                                className="relative group cursor-pointer rounded-xl border-2 border-dashed border-neutral-200 dark:border-neutral-800 hover:border-red-400 dark:hover:border-red-600 hover:bg-neutral-50 dark:hover:bg-neutral-900/50 transition-all duration-200 ease-out flex flex-col items-center justify-center gap-4 py-8 px-4"
                             >
-                                <div className={`
-                  p-3 rounded-md transition-colors duration-200
-                  ${isDragging ? 'bg-background text-foreground' : 'bg-muted text-muted-foreground group-hover:text-foreground'}
-                `}>
-                                    <Scissors className="w-5 h-5" />
+                                <div className="p-4 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-200">
+                                    <Upload className="w-8 h-8" />
                                 </div>
                                 <div className="text-center space-y-1">
-                                    <p className="text-sm font-medium text-foreground">Click or drop specific PDF here</p>
+                                    <p className="text-base font-semibold text-neutral-900 dark:text-white">
+                                        Click to upload or drag and drop
+                                    </p>
+                                    <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                                        PDF files only
+                                    </p>
                                 </div>
                                 <input
                                     ref={fileInputRef}
@@ -228,132 +241,117 @@ export default function PdfSplitPage() {
                                 />
                             </div>
                         ) : (
-                            <div className="p-6 rounded-lg border border-border bg-muted/20 space-y-4">
-                                <div className="flex items-start justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-background rounded text-foreground">
-                                            <FileIcon className="w-5 h-5" />
+                            <div className="space-y-6">
+                                {/* File Info */}
+                                <div className="flex items-center gap-4 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50">
+                                    <div className="w-12 h-12 rounded-lg bg-red-100 dark:bg-red-900/20 text-red-600 flex items-center justify-center shrink-0">
+                                        <FileIcon className="w-6 h-6" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-medium text-neutral-900 dark:text-neutral-100 truncate">{file.name}</p>
+                                        <p className="text-sm text-neutral-500">{file.pageCount} pages</p>
+                                    </div>
+                                </div>
+
+                                {/* Split Options */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <button
+                                        onClick={() => setSplitMode('all')}
+                                        className={cn(
+                                            "flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all text-center",
+                                            splitMode === 'all'
+                                                ? "border-red-600 bg-red-50 dark:bg-red-900/10 text-red-700 dark:text-red-400"
+                                                : "border-neutral-200 dark:border-neutral-800 hover:border-red-200 dark:hover:border-red-800"
+                                        )}
+                                    >
+                                        <div className={cn("p-2 rounded-lg", splitMode === 'all' ? "bg-red-200 dark:bg-red-800/30" : "bg-neutral-100 dark:bg-neutral-800")}>
+                                            <Scissors className="w-5 h-5" />
                                         </div>
                                         <div>
-                                            <p className="text-sm font-medium text-foreground">{file.name}</p>
-                                            <p className="text-xs text-muted-foreground">{file.pageCount} pages • {file.size}</p>
+                                            <p className="font-semibold text-sm">Extract All Pages</p>
+                                            <p className="text-xs opacity-70 mt-1">Save each page as a separate PDF</p>
                                         </div>
-                                    </div>
+                                    </button>
+
                                     <button
-                                        onClick={() => { setFile(null); setRangeInput('') }}
-                                        className="text-muted-foreground hover:text-foreground transition-colors"
+                                        onClick={() => setSplitMode('range')}
+                                        className={cn(
+                                            "flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all text-center",
+                                            splitMode === 'range'
+                                                ? "border-red-600 bg-red-50 dark:bg-red-900/10 text-red-700 dark:text-red-400"
+                                                : "border-neutral-200 dark:border-neutral-800 hover:border-red-200 dark:hover:border-red-800"
+                                        )}
                                     >
-                                        <X className="w-5 h-5" />
+                                        <div className={cn("p-2 rounded-lg", splitMode === 'range' ? "bg-red-200 dark:bg-red-800/30" : "bg-neutral-100 dark:bg-neutral-800")}>
+                                            <FileText className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold text-sm">Select Range</p>
+                                            <p className="text-xs opacity-70 mt-1">Extract specific pages (e.g. 1-5, 8)</p>
+                                        </div>
                                     </button>
                                 </div>
+
+                                {/* Range Input */}
+                                <AnimatePresence>
+                                    {splitMode === 'range' && (
+                                        <motion.div
+                                            initial={{ opacity: 0, height: 0 }}
+                                            animate={{ opacity: 1, height: 'auto' }}
+                                            exit={{ opacity: 0, height: 0 }}
+                                            className="overflow-hidden"
+                                        >
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                                                    Page Range
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={rangeInput}
+                                                    onChange={(e) => setRangeInput(e.target.value)}
+                                                    placeholder={`e.g. 1-5, 8, 11-${file.pageCount}`}
+                                                    className="w-full px-4 py-2 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-colors"
+                                                />
+                                                <p className="text-xs text-neutral-500">
+                                                    Enter page numbers and/or ranges separated by commas.
+                                                </p>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+
+                                {/* Action Button */}
+                                <button
+                                    onClick={splitPdf}
+                                    disabled={isProcessing || (splitMode === 'range' && !rangeInput)}
+                                    className={cn(
+                                        "w-full py-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-200",
+                                        isProcessing || (splitMode === 'range' && !rangeInput)
+                                            ? "bg-neutral-100 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed"
+                                            : "bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-500/20 hover:shadow-red-500/40 active:scale-[0.98]"
+                                    )}
+                                >
+                                    {isProcessing ? (
+                                        <>
+                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                            Processing...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Download className="w-5 h-5" />
+                                            {splitMode === 'all' ? 'Split All Pages' : 'Extract Range'}
+                                        </>
+                                    )}
+                                </button>
                             </div>
                         )}
 
                         {error && (
-                            <div className="p-3 rounded-md bg-red-500/10 border border-red-500/10 text-red-400 text-sm flex items-center gap-2">
-                                <AlertCircle className="w-4 h-4" />
+                            <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 text-red-600 dark:text-red-400 text-sm flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+                                <AlertCircle className="w-4 h-4 shrink-0" />
                                 {error}
                             </div>
                         )}
-                    </div>
-
-                    {/* Options & Actions */}
-                    <div className="space-y-8">
-                        <div className="space-y-4">
-                            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Split Options</h3>
-
-                            <div className="grid gap-4">
-                                <label className={`
-                    flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-all
-                    ${splitMode === 'all'
-                                        ? 'bg-muted border-primary/50'
-                                        : 'bg-transparent border-border hover:border-sidebar-ring'
-                                    }
-                 `}>
-                                    <input
-                                        type="radio"
-                                        name="splitMode"
-                                        className="hidden"
-                                        checked={splitMode === 'all'}
-                                        onChange={() => setSplitMode('all')}
-                                    />
-                                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${splitMode === 'all' ? 'border-primary' : 'border-muted-foreground'}`}>
-                                        {splitMode === 'all' && <div className="w-2 h-2 rounded-full bg-primary" />}
-                                    </div>
-                                    <div>
-                                        <span className="block text-sm font-medium text-foreground">Extract every page</span>
-                                        <span className="block text-xs text-muted-foreground mt-0.5">Save each page as a separate PDF file (ZIP)</span>
-                                    </div>
-                                </label>
-
-                                <label className={`
-                    flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-all
-                    ${splitMode === 'range'
-                                        ? 'bg-muted border-primary/50'
-                                        : 'bg-transparent border-border hover:border-sidebar-ring'
-                                    }
-                 `}>
-                                    <input
-                                        type="radio"
-                                        name="splitMode"
-                                        className="hidden"
-                                        checked={splitMode === 'range'}
-                                        onChange={() => setSplitMode('range')}
-                                    />
-                                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${splitMode === 'range' ? 'border-primary' : 'border-muted-foreground'}`}>
-                                        {splitMode === 'range' && <div className="w-2 h-2 rounded-full bg-primary" />}
-                                    </div>
-                                    <div>
-                                        <span className="block text-sm font-medium text-foreground">Select pages</span>
-                                        <span className="block text-xs text-muted-foreground mt-0.5">Extract specific pages or ranges to a new PDF</span>
-                                    </div>
-                                </label>
-                            </div>
-
-                            {splitMode === 'range' && (
-                                <motion.div
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: 'auto' }}
-                                    className="pt-2"
-                                >
-                                    <label className="block text-xs text-muted-foreground mb-2">Pages to extract (e.g. 1, 3-5, 8)</label>
-                                    <input
-                                        type="text"
-                                        value={rangeInput}
-                                        onChange={(e) => setRangeInput(e.target.value)}
-                                        placeholder={`1-${file?.pageCount || 5}`}
-                                        className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-ring"
-                                    />
-                                </motion.div>
-                            )}
-                        </div>
-
-                        <div className="pt-4 border-t border-border">
-                            <button
-                                onClick={splitPdf}
-                                disabled={!file || isProcessing || (splitMode === 'range' && !rangeInput)}
-                                className={`
-                    w-full py-3 rounded-lg font-medium text-sm flex items-center justify-center gap-2
-                    transition-all duration-200
-                    ${!file || isProcessing || (splitMode === 'range' && !rangeInput)
-                                        ? 'bg-muted text-muted-foreground cursor-not-allowed'
-                                        : 'bg-primary text-primary-foreground hover:bg-primary/90'
-                                    }
-                  `}
-                            >
-                                {isProcessing ? (
-                                    <>
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                        Processing...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Download className="w-4 h-4" />
-                                        {splitMode === 'all' ? 'Download ZIP' : 'Download PDF'}
-                                    </>
-                                )}
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>

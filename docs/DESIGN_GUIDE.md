@@ -3,241 +3,124 @@
 This document is the **single source of truth** for all UI decisions in ithasitall.
 It merges **tool-first discipline** with **quiet, premium visual taste**.
 
-This is **not** a marketing system. It is a **developer utility interface**.
-
-If a decision is not explicitly allowed here, default to **removing it**.
-
 ---
 
-## 1. Design Philosophy (Non-Negotiable)
+## 1. Design Philosophy
 
-**Mental model:** Browser DevTools × Raycast × Linear
+**Mental model:** A dedicated macOS utility app (Arc,Raycast) running in the browser.
 
 Core principles:
-
-* **Less is Luxury** — every element must earn its place
-* **Calm Confidence** — nothing flashy, nothing apologetic
-* **Speed over spectacle** — perceived performance matters more than beauty
-* **Familiarity wins** — predictable layouts feel premium to developers
-
-Avoid anything that feels like:
-
-* a SaaS landing page
-* an editorial website
-* a personal portfolio
+*   **Clean & Contained** — Tools live in centered, card-based "islands".
+*   **Functional Color** — Use color identity (e.g., PDF Red, Image Blue) to anchor context.
+*   **App-Like Feel** — Avoid full-page scrolling where possible; constrain lists to scrollable areas.
+*   **Frictionless** — Drag & drop, instant feedback, one-click actions.
 
 ---
 
-## 2. Psychological Foundations (Why this works)
+## 2. Layout System (The "App Tool" Standard)
 
-* Low visual noise → higher trust
-* Muted contrast → professionalism
-* Predictable structure → faster task completion
-* Minimal motion → sense of control
+All individual tools must follow this strict layout pattern to ensure consistency.
 
-The UI should feel like it is **already part of the developer’s workflow**.
-
----
-
-## 3. Layout System (Hard Constraints)
-
-### Global
-
-* Max content width: `1100–1200px`
-* Centered layout
-* Generous vertical spacing
-* Flat surfaces by default
+### Global Container
+*   **Standard Width:** `max-w-3xl` (centered).
+*   **Padding:** Default page padding handles the spacing; components shouldn't add unnecessary outer margins.
 
 ### Page Structure
+1.  **Detached Navigation (Top-Left)**
+    *   Position: Outside the main card, aligned left with the content `max-w-3xl`.
+    *   Style: Text-only or minimal icon + text link (`text-muted-foreground hover:text-foreground`).
+    *   Spacing: `mb-6` spacing from the main content.
 
-```
-Top Bar
-────────
-Search / Context
-────────
-Primary Content
-────────
-Secondary Actions
-```
+2.  **Header (Centered)**
+    *   **Icon:** Large (w-8 to w-10) centered icon.
+    *   **Icon Background:** Rounded-2xl container with `bg-{color}-500/10 text-{color}-500`.
+    *   **Title:** H1, centered, `text-3xl` or `text-4xl`, font-bold.
+    *   **Description:** `text-lg text-muted-foreground`, max-width constrained.
 
-Rules:
-
-* No default sidebars
-* No footers
-* No content sections that are not functional
-
----
-
-## 4. Typography (Premium but Invisible)
-
-Typography carries most of the perceived quality.
-
-### Primary Font (Required)
-
-**Geist Sans**
-
-* Used for all UI, body text, inputs, buttons
-* Neutral, modern, highly legible
-* Should fade into the background
-
-### Secondary Font (Optional, Very Limited)
-
-Choose **one**, and use only for **large headings (H1–H2)**:
-
-* Instrument Serif (preferred)
-* Playfair Display (acceptable, restrained)
-
-Rules:
-
-* Never use serif fonts in tool UIs, inputs, tables, or outputs
-* Never use italics for functional content
-* Max two fonts total
-
-### Type Scale
-
-* Body: 14–15px
-* Line height: 1.6–1.75
-* Headings: no more than 2 size steps above body
-* Font weights: 400–600 only (avoid extremes)
+3.  **Main Tool Card**
+    *   **Container:** `bg-white dark:bg-neutral-900`.
+    *   **Border:** `border border-neutral-200 dark:border-neutral-800`.
+    *   **Radius:** `rounded-2xl`.
+    *   **Shadow:** `shadow-sm` (keep it subtle).
+    *   **Structure:**
+        *   **Toolbar (Header):** `p-4 border-b bg-neutral-50/50`.
+        *   **Content Body:** `p-6 md:p-8`.
 
 ---
 
-## 5. Color System (Soft, Professional)
+## 3. Component Patterns
 
-Avoid pure black (`#000`) and pure white (`#FFF`).
+### Dropzone (The Entry Point)
+*   **Style:** Dashed border, 2px width (`border-2 border-dashed`).
+*   **State:** Neutral gray by default (`border-neutral-200`); Brand color on hover/drag (`border-blue-500 bg-blue-50`).
+*   **Interaction:** Must handle both click-to-open and drag-and-drop.
+*   **Size:** Generous vertical padding (`py-8` to `py-12`).
 
-### Light Mode
+### File Lists
+*   **Constraint:** **Never let a file list grow the page infinitely.**
+*   **Pattern:** Use a scrollable container with a sane max-height (e.g., `max-h-[300px] overflow-y-auto`).
+*   **Items:**
+    *   Row-based layout.
+    *   Entry animation: `opacity: 0, y: 10` -> `opacity: 1, y: 0`.
+    *   Exit animation: `opacity: 0, scale: 0.95`.
 
-* Background: `neutral-50` (soft off-white)
-* Surface: `white`
-* Text primary: `neutral-900`
-* Text secondary: `neutral-500`
-
-### Dark Mode (First-Class)
-
-* Background: `neutral-950`
-* Surface: `neutral-900`
-* Text primary: `neutral-200`
-* Text secondary: `neutral-400`
-* Borders: `neutral-800`
-
-### Accent Color
-
-* Single accent only
-* Muted (no neon, no gradients)
-* Used for:
-
-  * focus states
-  * primary action
-  * active tool
+### Primary Action Button
+*   **Placement:** At the bottom of the card content area.
+*   **Style:** Full width (`w-full`), large touch target (`py-4`).
+*   **Appearance:** Solid brand color (`bg-blue-600 text-white`), subtle colored shadow (`shadow-blue-500/20`).
 
 ---
 
-## 6. Components (Componentry-Aligned)
+## 4. Typography
 
-Always prefer existing components from **Componentry**.
-
-Component rules:
-
-* Flat by default
-* Borders > shadows
-* Rounded corners: subtle (6–8px)
-* Hover states: background or opacity shift only
-
-Avoid:
-
-* heavy shadows
-* glassmorphism by default
-* floating cards everywhere
-
-Glass / blur may be used **sparingly** for:
-
-* top navigation
-* modals
+*   **Font:** Geist Sans (or similar premium sans-serif).
+*   **Headings:** `text-neutral-900 dark:text-white`.
+*   **Body:** `text-neutral-500 dark:text-neutral-400`.
+*   **Monospace:** Use explicitly for data outputs only.
 
 ---
 
-## 7. Motion & Framer Motion (Functional Only)
+## 5. Color System
 
-Motion is allowed **only when it improves clarity**.
+### Neutral Foundation
+*   Light: `bg-white` surface on `bg-neutral-50` page.
+*   Dark: `bg-neutral-900` surface on `bg-black` or `bg-neutral-950` page.
 
-### Allowed Use Cases
+### Functional Identity
+Tools should use a primary "identity color" to aid recognition.
+*   **PDF Tools:** Red (`text-red-500 bg-red-500/10`)
+*   **Image Tools:** Blue (`text-blue-500 bg-blue-500/10`)
+*   **Video Tools:** Indigo/Purple
+*   **Code/Data:** Emerald/Green
 
-* Tool switching
-* Page transitions
-* Expand / collapse
-* Focus guidance
-
-### Motion Rules
-
-* Duration: `120–220ms`
-* Easing: ease-out or subtle cubic-bezier
-* Prefer layout animations
-* One motion per interaction
-
-### Strictly Avoid
-
-* Bounce or spring physics
-* Blur-based entrances
-* Staggered cinematic reveals
-* Motion on initial page load
-
-Motion should feel like **friction**, not flair.
+Use these colors for:
+1.  Header Icon background.
+2.  Active focus states.
+3.  Primary action buttons (solid).
 
 ---
 
-## 8. Tool UX Rules (Critical)
+## 6. Motion (Functional Polish)
+While we avoid "decorative" motion, **functional motion** is mandatory for a premium feel.
 
-* Input always on top
-* Output always below
-* Separation via spacing, not decoration
-
-Buttons:
-
-* Primary action on the right
-* Secondary actions muted
-* Icons only when universally understood
-
-A tool should be usable **without explanation**.
+*   **Framer Motion** is the standard.
+*   **Use Cases:**
+    *   Files entering/leaving a list (Layout animations).
+    *   Error messages sliding in.
+    *   Tool mode switching.
+*   **Feel:** Snappy but smooth (`duration-200` to `duration-300`).
 
 ---
 
-## 9. Iconography
+## 7. What NOT to Do
+*   ❌ Don't use default browser alerts; use inline error messages.
+*   ❌ Don't make the user scroll unnecessarily; keep the UI compact.
+*   ❌ Don't use inconsistent border attributes; stick to the standard `border-neutral-200` / `rounded-2xl`.
+*   ❌ Don't place navigation inside the main card; keep it detached for hierarchy.
 
-* Single icon set only
-* Simple geometric icons (e.g. lucide-style)
-* Icons support text, never replace it
+**Checklist before shipping:**
+1.  Is the main card centered `max-w-3xl`?
+2.  Does the file list scroll internally?
+3.  Is the "Back to Tools" link positioned correctly at the top-left?
+4.  Are interactions (hover, focus, drag) clear and responsive?
 
-If text alone works, remove the icon.
-
----
-
-## 10. What NOT to Do (Absolute Rules)
-
-* ❌ No hero sections
-* ❌ No testimonials
-* ❌ No marketing copy
-* ❌ No decorative animations
-* ❌ No playful or quirky UI language
-
-The product should feel:
-
-> Serious, fast, calm, and reliable.
-
----
-
-## 11. Final Quality Checklist
-
-Before shipping any UI:
-
-1. Would this feel at home inside DevTools?
-2. Does anything draw attention to itself?
-3. Can the task be completed in under 5 seconds?
-4. Does it still feel premium if simplified further?
-
-If yes → ship.
-
----
-
-**This guide is canonical.**
-Any deviation must be minimal, intentional, and justified.
