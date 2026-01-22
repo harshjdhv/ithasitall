@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useRef, useEffect } from 'react'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
     ImageIcon,
@@ -11,8 +12,10 @@ import {
     Loader2,
     RefreshCw,
     Lock,
-    Unlock
+    Unlock,
+    ArrowLeft
 } from 'lucide-react'
+import { cn } from "@/lib/utils"
 
 interface ImageFile {
     id: string;
@@ -32,6 +35,7 @@ interface ImageFile {
 export default function ImageResizePage() {
     const [files, setFiles] = useState<ImageFile[]>([])
     const [isDragging, setIsDragging] = useState(false)
+    const [isProcessing, setIsProcessing] = useState(false)
     const [globalWidth, setGlobalWidth] = useState<number | undefined>(undefined)
     const [globalHeight, setGlobalHeight] = useState<number | undefined>(undefined)
     const [error, setError] = useState<string | null>(null)
@@ -49,7 +53,7 @@ export default function ImageResizePage() {
         if (!newFiles) return
         setError(null)
 
-        const validFiles: Promise<ImageFile>[] = Array.from(newFiles)
+        const validFilesPromises: Promise<ImageFile>[] = Array.from(newFiles)
             .filter(file => file.type.startsWith('image/'))
             .map(file => {
                 return new Promise<ImageFile>((resolve) => {
@@ -90,9 +94,25 @@ export default function ImageResizePage() {
                 })
             })
 
-        Promise.all(validFiles).then(res => {
+        Promise.all(validFilesPromises).then(res => {
             setFiles(prev => [...prev, ...res])
         })
+    }
+
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault()
+        setIsDragging(true)
+    }
+
+    const handleDragLeave = (e: React.DragEvent) => {
+        e.preventDefault()
+        setIsDragging(false)
+    }
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault()
+        setIsDragging(false)
+        handleFiles(e.dataTransfer.files)
     }
 
     const resizeImage = async (imageFile: ImageFile) => {
@@ -131,6 +151,7 @@ export default function ImageResizePage() {
     }
 
     const processAll = async () => {
+        setIsProcessing(true)
         const newFiles = [...files]
         for (let i = 0; i < newFiles.length; i++) {
             if (newFiles[i]!.status !== 'done') {
@@ -140,6 +161,7 @@ export default function ImageResizePage() {
                 setFiles([...newFiles])
             }
         }
+        setIsProcessing(false)
     }
 
     const updateDimensions = (id: string, width: number, height: number, locked: boolean) => {
@@ -197,52 +219,118 @@ export default function ImageResizePage() {
     }, [])
 
     return (
-        <div className="min-h-screen bg-background text-foreground p-1 md:p-12 font-sans selection:bg-muted">
-            <div className="max-w-[1100px] mx-auto space-y-12">
+        <div className="animate-in fade-in duration-500">
+            {/* Back Navigation */}
+            <div className="max-w-3xl mx-auto mb-6">
+                <Link
+                    href="/tools"
+                    className="inline-flex items-center text-sm text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200 transition-colors"
+                >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to Tools
+                </Link>
+            </div>
+
+            <div className="max-w-3xl mx-auto space-y-6">
 
                 {/* Header */}
-                <div className="space-y-4">
-                    <h1 className="text-3xl font-medium tracking-tight text-foreground">
-                        Image Resize
-                    </h1>
-                    <p className="text-lg text-muted-foreground max-w-2xl">
-                        Resize images while maintaining aspect ratio.
-                    </p>
+                <div className="space-y-4 text-center">
+                    <div className="space-y-2">
+                        <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-blue-500/10 text-blue-500 mb-2">
+                            <ImageIcon className="w-8 h-8" />
+                        </div>
+                        <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white sm:text-4xl">
+                            Image Resize
+                        </h1>
+                        <p className="text-lg text-neutral-500 dark:text-neutral-400 max-w-lg mx-auto">
+                            Resize images while maintaining aspect ratio.
+                        </p>
+                    </div>
                 </div>
 
-                {/* Main Content */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                {/* Main Card */}
+                <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-sm overflow-hidden">
 
-                    <div className="space-y-4">
+                    {/* Toolbar */}
+                    <div className="p-4 border-b border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4 bg-neutral-50/50 dark:bg-neutral-900/50">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
+                            <div className="text-sm font-medium text-neutral-600 dark:text-neutral-300 whitespace-nowrap">
+                                {files.length} {files.length === 1 ? 'image' : 'images'}
+                            </div>
+
+                            {/* Global Resize Controls */}
+                            {files.length > 0 && (
+                                <div className="flex items-center gap-2 p-1 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg">
+                                    <input
+                                        type="number"
+                                        placeholder="W"
+                                        className="w-16 h-7 text-xs px-2 bg-transparent border-r border-neutral-200 dark:border-neutral-700 focus:outline-none"
+                                        value={globalWidth || ''}
+                                        onChange={e => setGlobalWidth(parseInt(e.target.value) || undefined)}
+                                    />
+                                    <input
+                                        type="number"
+                                        placeholder="H"
+                                        className="w-16 h-7 text-xs px-2 bg-transparent focus:outline-none"
+                                        value={globalHeight || ''}
+                                        onChange={e => setGlobalHeight(parseInt(e.target.value) || undefined)}
+                                    />
+                                    <button
+                                        onClick={applyGlobalDimensions}
+                                        className="h-7 px-3 bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300 text-xs rounded hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-colors"
+                                    >
+                                        Apply
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                            {files.length > 0 && (
+                                <button
+                                    onClick={() => setFiles([])}
+                                    className="text-xs px-3 py-1.5 rounded-md text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors font-medium"
+                                >
+                                    Clear All
+                                </button>
+                            )}
+                            <button
+                                onClick={() => fileInputRef.current?.click()}
+                                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-sm font-medium hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors"
+                            >
+                                <Upload className="w-4 h-4" />
+                                Add Images
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="p-6 md:p-8 space-y-6">
+                        {/* Drop Zone */}
                         <div
                             onClick={() => fileInputRef.current?.click()}
-                            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-                            onDragLeave={(e) => { e.preventDefault(); setIsDragging(false); }}
-                            onDrop={(e) => {
-                                e.preventDefault();
-                                setIsDragging(false);
-                                handleFiles(e.dataTransfer.files);
-                            }}
-                            className={`
-                                relative group cursor-pointer
-                                border border-dashed rounded-lg h-64
-                                flex flex-col items-center justify-center gap-4
-                                transition-colors duration-200 ease-out
-                                ${isDragging
-                                    ? 'border-primary bg-muted'
-                                    : 'border-border hover:border-sidebar-ring bg-transparent hover:bg-muted/50'
-                                }
-                            `}
+                            onDragOver={handleDragOver}
+                            onDragLeave={handleDragLeave}
+                            onDrop={handleDrop}
+                            className={cn(
+                                "relative group cursor-pointer rounded-xl border-2 border-dashed transition-all duration-200 ease-out flex flex-col items-center justify-center gap-4 py-8 px-4",
+                                isDragging
+                                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900/10"
+                                    : "border-neutral-200 dark:border-neutral-800 hover:border-blue-400 dark:hover:border-blue-600 hover:bg-neutral-50 dark:hover:bg-neutral-900/50"
+                            )}
                         >
-                            <div className={`
-                                p-3 rounded-md transition-colors duration-200
-                                ${isDragging ? 'bg-background text-foreground' : 'bg-muted text-muted-foreground group-hover:text-foreground'}
-                            `}>
-                                <Upload className="w-5 h-5" />
+                            <div className={cn(
+                                "p-4 rounded-full transition-colors duration-200",
+                                isDragging ? "bg-blue-100 text-blue-600" : "bg-neutral-100 dark:bg-neutral-800 text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300"
+                            )}>
+                                <ImageIcon className="w-8 h-8" />
                             </div>
                             <div className="text-center space-y-1">
-                                <p className="text-sm font-medium text-foreground">Click or drop Images here</p>
-                                <p className="text-xs text-muted-foreground">Supports JPG, PNG, WEBP</p>
+                                <p className="text-base font-semibold text-neutral-900 dark:text-white">
+                                    Click to upload or drag and drop
+                                </p>
+                                <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                                    JPG, PNG, WEBP supported
+                                </p>
                             </div>
                             <input
                                 ref={fileInputRef}
@@ -254,178 +342,130 @@ export default function ImageResizePage() {
                             />
                         </div>
 
-                        {/* Global Controls */}
-                        {files.length > 0 && (
-                            <div className="p-4 border border-border rounded-lg bg-card space-y-3">
-                                <p className="text-sm font-medium text-foreground">Set Dimensions for All</p>
-                                <div className="flex items-end gap-2">
-                                    <div className="space-y-1 flex-1">
-                                        <label className="text-xs text-muted-foreground">Width</label>
-                                        <input
-                                            type="number"
-                                            placeholder="Width"
-                                            className="w-full px-2 py-1 bg-background border border-border rounded text-sm"
-                                            value={globalWidth || ''}
-                                            onChange={e => setGlobalWidth(parseInt(e.target.value) || undefined)}
-                                        />
-                                    </div>
-                                    <div className="space-y-1 flex-1">
-                                        <label className="text-xs text-muted-foreground">Height</label>
-                                        <input
-                                            type="number"
-                                            placeholder="Height"
-                                            className="w-full px-2 py-1 bg-background border border-border rounded text-sm"
-                                            value={globalHeight || ''}
-                                            onChange={e => setGlobalHeight(parseInt(e.target.value) || undefined)}
-                                        />
-                                    </div>
-                                    <button
-                                        onClick={applyGlobalDimensions}
-                                        className="h-[30px] px-3 bg-secondary text-secondary-foreground text-xs rounded hover:bg-secondary/80 transition-colors"
-                                    >
-                                        Apply
-                                    </button>
-                                </div>
-                                <button onClick={processAll} className="w-full py-2 bg-primary text-primary-foreground text-sm rounded-md hover:bg-primary/90 transition-colors mt-2">
-                                    Resize All
-                                </button>
-                            </div>
-                        )}
                         {error && (
-                            <div className="p-3 rounded-md bg-red-500/10 border border-red-500/10 text-red-400 text-sm flex items-center gap-2">
-                                <AlertCircle className="w-4 h-4" />
+                            <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 text-red-600 dark:text-red-400 text-sm flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+                                <AlertCircle className="w-4 h-4 shrink-0" />
                                 {error}
                             </div>
                         )}
-                    </div>
 
-                    {/* File List */}
-                    <div className="space-y-6">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-sm font-medium text-muted-foreground">Images ({files.length})</h3>
-                            {files.length > 0 && (
-                                <button
-                                    onClick={() => setFiles([])}
-                                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                                >
-                                    Clear all
-                                </button>
-                            )}
-                        </div>
+                        {/* File List */}
+                        <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                            <AnimatePresence initial={false} mode='popLayout'>
+                                {files.map((file) => (
+                                    <motion.div
+                                        key={file.id}
+                                        layout
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, scale: 0.95 }}
+                                        className="group relative flex flex-col sm:flex-row sm:items-center gap-4 p-3 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:shadow-sm transition-all"
+                                    >
+                                        <div className="flex items-center gap-4 flex-1">
+                                            <div className="w-12 h-12 rounded-lg bg-neutral-100 dark:bg-neutral-800 overflow-hidden shrink-0 border border-neutral-200 dark:border-neutral-700">
+                                                <img src={file.previewUrl} alt={file.name} className="w-full h-full object-cover" />
+                                            </div>
 
-                        <div className="min-h-[200px] rounded-lg border border-border bg-transparent p-0 overflow-hidden">
-                            <div className="max-h-[500px] overflow-y-auto custom-scrollbar">
-                                <AnimatePresence initial={false} mode='popLayout'>
-                                    {files.length === 0 ? (
-                                        <div className="h-64 flex flex-col items-center justify-center text-muted-foreground gap-3">
-                                            <ImageIcon className="w-8 h-8 opacity-20" />
-                                            <p className="text-sm">No images selected</p>
-                                        </div>
-                                    ) : (
-                                        files.map((file) => (
-                                            <motion.div
-                                                key={file.id}
-                                                layout
-                                                initial={{ opacity: 0, height: 0 }}
-                                                animate={{ opacity: 1, height: 'auto' }}
-                                                exit={{ opacity: 0, height: 0 }}
-                                                className="group p-3 border-b border-border last:border-0 hover:bg-muted/30 transition-colors"
-                                            >
-                                                <div className="flex items-start gap-3">
-                                                    <div className="w-12 h-12 rounded bg-muted/50 overflow-hidden flex-shrink-0 border border-border">
-                                                        <img src={file.previewUrl} alt={file.name} className="w-full h-full object-cover" />
-                                                    </div>
-
-                                                    <div className="flex-1 min-w-0 space-y-1">
-                                                        <div className="flex justify-between items-start">
-                                                            <p className="text-sm font-medium text-foreground truncate max-w-[200px]">{file.name}</p>
-                                                            <button
-                                                                onClick={() => removeFile(file.id)}
-                                                                className="text-muted-foreground hover:text-destructive transition-colors"
-                                                            >
-                                                                <X className="w-4 h-4" />
-                                                            </button>
-                                                        </div>
-                                                        <div className="text-xs text-muted-foreground">
-                                                            Original: {file.originalWidth} x {file.originalHeight}
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="mt-3 flex items-center gap-2">
-                                                    <div className="relative flex-1">
-                                                        <input
-                                                            type="number"
-                                                            value={file.targetWidth}
-                                                            onChange={(e) => updateDimensions(file.id, parseInt(e.target.value) || 0, file.targetHeight, file.maintainAspect)}
-                                                            className="w-full px-2 py-1.5 text-xs bg-background border border-border rounded focus:outline-none focus:border-primary"
-                                                            placeholder="W"
-                                                        />
-                                                        <span className="absolute right-2 top-1.5 text-[10px] text-muted-foreground">px</span>
-                                                    </div>
-                                                    <button
-                                                        onClick={() => setFiles(prev => prev.map(f => f.id === file.id ? { ...f, maintainAspect: !f.maintainAspect } : f))}
-                                                        className={`p-1.5 rounded transition-colors ${file.maintainAspect ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:bg-muted'}`}
-                                                    >
-                                                        {file.maintainAspect ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
-                                                    </button>
-                                                    <div className="relative flex-1">
-                                                        <input
-                                                            type="number"
-                                                            value={file.targetHeight}
-                                                            onChange={(e) => updateDimensions(file.id, file.targetWidth, parseInt(e.target.value) || 0, file.maintainAspect)}
-                                                            className="w-full px-2 py-1.5 text-xs bg-background border border-border rounded focus:outline-none focus:border-primary"
-                                                            placeholder="H"
-                                                        />
-                                                        <span className="absolute right-2 top-1.5 text-[10px] text-muted-foreground">px</span>
-                                                    </div>
-                                                </div>
-
-                                                <div className="mt-3 flex justify-end">
-                                                    {file.status === 'done' && file.resizedUrl ? (
-                                                        <a
-                                                            href={file.resizedUrl}
-                                                            download={`resized-${file.name}`}
-                                                            className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary text-xs rounded-md hover:bg-primary/20 transition-colors"
-                                                        >
-                                                            <Download className="w-3.5 h-3.5" /> Download
-                                                        </a>
-                                                    ) : (
-                                                        file.status !== 'processing' ? (
-                                                            <button
-                                                                onClick={() => {
-                                                                    const idx = files.findIndex(f => f.id === file.id);
-                                                                    const newFiles = [...files];
-                                                                    if (newFiles[idx]) {
-                                                                        newFiles[idx]!.status = 'processing';
-                                                                        setFiles(newFiles);
-                                                                        resizeImage(newFiles[idx]!).then(res => {
-                                                                            const final = [...files];
-                                                                            const i = final.findIndex(f => f.id === file.id);
-                                                                            if (i !== -1) {
-                                                                                final[i] = res;
-                                                                                setFiles(final);
-                                                                            }
-                                                                        })
-                                                                    }
-                                                                }}
-                                                                className="flex items-center gap-1.5 px-3 py-1.5 bg-secondary text-secondary-foreground text-xs rounded-md hover:bg-secondary/80 transition-colors"
-                                                            >
-                                                                <RefreshCw className="w-3.5 h-3.5" /> Resize
-                                                            </button>
-                                                        ) : (
-                                                            <div className="text-xs text-blue-500 flex items-center gap-1">
-                                                                <Loader2 className="w-3 h-3 animate-spin" /> Processing...
-                                                            </div>
-                                                        )
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100 truncate max-w-[200px]">
+                                                    {file.name}
+                                                </p>
+                                                <div className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
+                                                    <span>{file.originalWidth}x{file.originalHeight}</span>
+                                                    {file.status === 'done' && (
+                                                        <>
+                                                            <span>→</span>
+                                                            <span className="text-green-600 dark:text-green-400 font-medium">{file.targetWidth}x{file.targetHeight}</span>
+                                                        </>
                                                     )}
                                                 </div>
-                                            </motion.div>
-                                        ))
-                                    )}
-                                </AnimatePresence>
-                            </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-4 justify-between sm:justify-end w-full sm:w-auto mt-2 sm:mt-0">
+
+                                            {/* Resize Inputs per item */}
+                                            <div className="flex items-center gap-2">
+                                                <div className="relative">
+                                                    <input
+                                                        type="number"
+                                                        value={file.targetWidth}
+                                                        onChange={(e) => updateDimensions(file.id, parseInt(e.target.value) || 0, file.targetHeight, file.maintainAspect)}
+                                                        className="w-16 h-7 text-xs px-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                        placeholder="W"
+                                                    />
+                                                    <span className="absolute right-1 top-1.5 text-[8px] text-neutral-400">px</span>
+                                                </div>
+                                                <button
+                                                    onClick={() => setFiles(prev => prev.map(f => f.id === file.id ? { ...f, maintainAspect: !f.maintainAspect } : f))}
+                                                    className={`p-1.5 rounded transition-colors ${file.maintainAspect ? 'text-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'}`}
+                                                    title={file.maintainAspect ? "Unlock Aspect Ratio" : "Lock Aspect Ratio"}
+                                                >
+                                                    {file.maintainAspect ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+                                                </button>
+                                                <div className="relative">
+                                                    <input
+                                                        type="number"
+                                                        value={file.targetHeight}
+                                                        onChange={(e) => updateDimensions(file.id, file.targetWidth, parseInt(e.target.value) || 0, file.maintainAspect)}
+                                                        className="w-16 h-7 text-xs px-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                        placeholder="H"
+                                                    />
+                                                    <span className="absolute right-1 top-1.5 text-[8px] text-neutral-400">px</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center gap-2">
+                                                {file.status === 'done' && file.resizedUrl ? (
+                                                    <a
+                                                        href={file.resizedUrl}
+                                                        download={`resized-${file.name}`}
+                                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-green-50 text-green-600 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/30 text-xs font-medium transition-colors"
+                                                    >
+                                                        <Download className="w-3.5 h-3.5" />
+                                                        Download
+                                                    </a>
+                                                ) : null}
+
+                                                <button
+                                                    onClick={() => removeFile(file.id)}
+                                                    className="p-1.5 rounded-md text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
                         </div>
+
+                        {/* Action Button */}
+                        <div className="pt-2">
+                            <button
+                                onClick={processAll}
+                                disabled={files.length === 0 || isProcessing}
+                                className={cn(
+                                    "w-full py-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-200",
+                                    files.length === 0 || isProcessing
+                                        ? "bg-neutral-100 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed"
+                                        : "bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 active:scale-[0.98]"
+                                )}
+                            >
+                                {isProcessing ? (
+                                    <>
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        Resizing Images...
+                                    </>
+                                ) : (
+                                    <>
+                                        <RefreshCw className="w-5 h-5" />
+                                        Resize All Images
+                                    </>
+                                )}
+                            </button>
+                        </div>
+
                     </div>
                 </div>
             </div>

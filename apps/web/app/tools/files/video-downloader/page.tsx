@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from 'react'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
     Video,
@@ -8,8 +9,10 @@ import {
     AlertCircle,
     Loader2,
     Link as LinkIcon,
-    CheckCircle
+    CheckCircle,
+    ArrowLeft
 } from 'lucide-react'
+import { cn } from "@/lib/utils"
 
 export default function VideoDownloaderPage() {
     const [url, setUrl] = useState('')
@@ -91,30 +94,47 @@ export default function VideoDownloaderPage() {
     }
 
     return (
-        <div className="min-h-screen bg-background text-foreground p-1 md:p-12 font-sans selection:bg-muted">
-            <div className="max-w-[800px] mx-auto space-y-12">
+        <div className="animate-in fade-in duration-500">
+            {/* Back Navigation */}
+            <div className="max-w-3xl mx-auto mb-6">
+                <Link
+                    href="/tools"
+                    className="inline-flex items-center text-sm text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200 transition-colors"
+                >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to Tools
+                </Link>
+            </div>
+
+            <div className="max-w-3xl mx-auto space-y-6">
 
                 {/* Header */}
                 <div className="space-y-4 text-center">
-                    <h1 className="text-3xl font-medium tracking-tight text-foreground">
-                        Video Downloader
-                    </h1>
-                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                        Download videos from direct URLs.
-                    </p>
+                    <div className="space-y-2">
+                        <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-blue-500/10 text-blue-500 mb-2">
+                            <Video className="w-8 h-8" />
+                        </div>
+                        <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white sm:text-4xl">
+                            Video Downloader
+                        </h1>
+                        <p className="text-lg text-neutral-500 dark:text-neutral-400 max-w-lg mx-auto">
+                            Download videos from direct URLs.
+                        </p>
+                    </div>
                 </div>
 
-                {/* Main Input */}
-                <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-6">
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">Video URL</label>
+                {/* Main Card */}
+                <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-sm overflow-hidden p-6 md:p-8 space-y-6">
+
+                    <div className="space-y-4">
+                        <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Video URL</label>
                         <div className="flex gap-2">
                             <div className="relative flex-1">
-                                <LinkIcon className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                                <LinkIcon className="absolute left-3 top-3 w-4 h-4 text-neutral-400" />
                                 <input
                                     type="url"
                                     placeholder="https://example.com/video.mp4"
-                                    className="w-full pl-9 pr-4 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                    className="w-full pl-9 pr-4 py-2.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-mono text-sm"
                                     value={url}
                                     onChange={(e) => setUrl(e.target.value)}
                                 />
@@ -122,7 +142,7 @@ export default function VideoDownloaderPage() {
                             <button
                                 onClick={handleDownload}
                                 disabled={!url || status === 'checking' || status === 'downloading'}
-                                className="px-6 py-2.5 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 flex items-center gap-2"
                             >
                                 {status === 'checking' || status === 'downloading' ? (
                                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -136,64 +156,65 @@ export default function VideoDownloaderPage() {
 
                     {status === 'downloading' && (
                         <div className="space-y-2">
-                            <div className="flex justify-between text-xs text-muted-foreground">
+                            <div className="flex justify-between text-xs text-neutral-500">
                                 <span>Downloading...</span>
                                 <span>{progress > 0 ? `${progress}%` : '...'}</span>
                             </div>
-                            <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                            <div className="h-2 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
                                 <div
-                                    className="h-full bg-primary transition-all duration-300"
+                                    className="h-full bg-blue-500 transition-all duration-300"
                                     style={{ width: `${progress}%` }}
                                 />
                             </div>
                         </div>
                     )}
 
-                    {status === 'done' && fileInfo && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 flex items-center justify-between"
-                        >
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-500">
-                                    <CheckCircle className="w-5 h-5" />
-                                </div>
-                                <div>
-                                    <p className="text-sm font-medium text-foreground">{fileInfo.name}</p>
-                                    <p className="text-xs text-muted-foreground">{fileInfo.size}</p>
-                                </div>
-                            </div>
-                            <a
-                                href={fileInfo.blobUrl}
-                                download={fileInfo.name}
-                                className="px-4 py-2 bg-background border border-border rounded-md text-sm font-medium hover:bg-muted transition-colors flex items-center gap-2"
+                    <AnimatePresence>
+                        {status === 'done' && fileInfo && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-900/20 rounded-xl p-4 flex items-center justify-between"
                             >
-                                <Download className="w-4 h-4" /> Save File
-                            </a>
-                        </motion.div>
-                    )}
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400">
+                                        <CheckCircle className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">{fileInfo.name}</p>
+                                        <p className="text-xs text-neutral-500 dark:text-neutral-400">{fileInfo.size}</p>
+                                    </div>
+                                </div>
+                                <a
+                                    href={fileInfo.blobUrl}
+                                    download={fileInfo.name}
+                                    className="px-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-sm font-medium hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors flex items-center gap-2 shadow-sm"
+                                >
+                                    <Download className="w-4 h-4" /> Save File
+                                </a>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
 
                     {error && (
                         <motion.div
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="p-4 rounded-lg bg-red-500/10 border border-red-500/10 text-red-400 text-sm flex items-start gap-3"
+                            className="p-4 rounded-xl bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 text-red-600 dark:text-red-400 text-sm flex items-start gap-3"
                         >
                             <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                             <div className="space-y-1">
                                 <p className="font-medium">Download Failed</p>
-                                <p className="opacity-90">{error}</p>
+                                <p className="opacity-90 leading-relaxed">{error}</p>
                             </div>
                         </motion.div>
                     )}
 
-                    <div className="text-xs text-muted-foreground bg-muted/30 p-4 rounded-lg">
+                    <div className="text-xs text-neutral-500 bg-neutral-50 dark:bg-neutral-900/50 p-4 rounded-xl border border-neutral-100 dark:border-neutral-800 leading-relaxed">
                         <p><strong>Note:</strong> This tool only works with direct video links (ending in .mp4, .webm, etc) served with proper CORS headers. It cannot download from streaming sites like YouTube due to browser restrictions.</p>
                     </div>
 
                 </div>
-
             </div>
         </div>
     )
