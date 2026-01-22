@@ -133,10 +133,10 @@ export default function ImageResizePage() {
     const processAll = async () => {
         const newFiles = [...files]
         for (let i = 0; i < newFiles.length; i++) {
-            if (newFiles[i].status !== 'done') {
-                newFiles[i].status = 'processing'
+            if (newFiles[i]!.status !== 'done') {
+                newFiles[i]!.status = 'processing'
                 setFiles([...newFiles])
-                newFiles[i] = await resizeImage(newFiles[i])
+                newFiles[i] = await resizeImage(newFiles[i]!)
                 setFiles([...newFiles])
             }
         }
@@ -396,16 +396,18 @@ export default function ImageResizePage() {
                                                                 onClick={() => {
                                                                     const idx = files.findIndex(f => f.id === file.id);
                                                                     const newFiles = [...files];
-                                                                    newFiles[idx].status = 'processing';
-                                                                    setFiles(newFiles);
-                                                                    resizeImage(newFiles[idx]).then(res => {
-                                                                        const final = [...files];
-                                                                        const i = final.findIndex(f => f.id === file.id);
-                                                                        if (i !== -1) {
-                                                                            final[i] = res;
-                                                                            setFiles(final);
-                                                                        }
-                                                                    })
+                                                                    if (newFiles[idx]) {
+                                                                        newFiles[idx]!.status = 'processing';
+                                                                        setFiles(newFiles);
+                                                                        resizeImage(newFiles[idx]!).then(res => {
+                                                                            const final = [...files];
+                                                                            const i = final.findIndex(f => f.id === file.id);
+                                                                            if (i !== -1) {
+                                                                                final[i] = res;
+                                                                                setFiles(final);
+                                                                            }
+                                                                        })
+                                                                    }
                                                                 }}
                                                                 className="flex items-center gap-1.5 px-3 py-1.5 bg-secondary text-secondary-foreground text-xs rounded-md hover:bg-secondary/80 transition-colors"
                                                             >

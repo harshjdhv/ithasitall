@@ -115,10 +115,10 @@ export default function ImageCompressPage() {
     const processAll = async () => {
         const newFiles = [...files]
         for (let i = 0; i < newFiles.length; i++) {
-            if (newFiles[i].status !== 'done') {
-                newFiles[i].status = 'processing'
+            if (newFiles[i]!.status !== 'done') {
+                newFiles[i]!.status = 'processing'
                 setFiles([...newFiles]) // trigger update
-                newFiles[i] = await compressImage(newFiles[i])
+                newFiles[i] = await compressImage(newFiles[i]!)
                 setFiles([...newFiles])
             }
         }
@@ -329,16 +329,18 @@ export default function ImageCompressPage() {
                                                                 onClick={() => {
                                                                     const idx = files.findIndex(f => f.id === file.id)
                                                                     const newFiles = [...files]
-                                                                    newFiles[idx].status = 'processing'
-                                                                    setFiles(newFiles)
-                                                                    compressImage(newFiles[idx]).then(res => {
-                                                                        const finalFiles = [...files]
-                                                                        const fIdx = finalFiles.findIndex(f => f.id === file.id)
-                                                                        if (fIdx !== -1) {
-                                                                            finalFiles[fIdx] = res
-                                                                            setFiles(finalFiles)
-                                                                        }
-                                                                    })
+                                                                    if (newFiles[idx]) {
+                                                                        newFiles[idx]!.status = 'processing'
+                                                                        setFiles(newFiles)
+                                                                        compressImage(newFiles[idx]!).then(res => {
+                                                                            const finalFiles = [...files]
+                                                                            const fIdx = finalFiles.findIndex(f => f.id === file.id)
+                                                                            if (fIdx !== -1) {
+                                                                                finalFiles[fIdx] = res
+                                                                                setFiles(finalFiles)
+                                                                            }
+                                                                        })
+                                                                    }
                                                                 }}
                                                                 className="flex items-center gap-1.5 px-3 py-1.5 bg-secondary text-secondary-foreground text-xs rounded-md hover:bg-secondary/80 transition-colors"
                                                             >
