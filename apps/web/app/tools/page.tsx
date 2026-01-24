@@ -81,12 +81,10 @@ const categoryIcons = {
 
 const ToolCard = ({
   tool,
-  colorClass,
 }: {
   tool: { name: string; icon: React.ReactNode; href?: string };
-  colorClass: string;
 }) => {
-  const colors = categoryColors[colorClass as keyof typeof categoryColors];
+
 
   if (tool.href) {
     return (
@@ -154,8 +152,8 @@ const CategorySection = ({
         </h2>
       </div>
       <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {tools.map((tool, index) => (
-          <ToolCard key={tool.name} tool={tool} colorClass={colorKey} />
+        {tools.map((tool) => (
+          <ToolCard key={tool.name} tool={tool} />
         ))}
       </ul>
     </motion.div>
@@ -223,11 +221,7 @@ const ToolsPage = () => {
           icon: <ImageIcon {...iconProps} />,
           href: "/tools/files/image-converter",
         },
-        {
-          name: "Video Downloader",
-          icon: <Video {...iconProps} />,
-          href: "/tools/files/video-downloader",
-        },
+
         {
           name: "Audio Extract from Video",
           icon: <Music {...iconProps} />,
